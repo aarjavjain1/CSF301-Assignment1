@@ -2,10 +2,18 @@
 
 #include "customcompiler.h"
 
+#define GRAMMAR_FILE_PATH "grammar.txt"
+#define SOURCE_CODE_FILE_PATH "sourcecode.txt"
+
 int main(int argc, char* argv[]){
     // TODO
     // Argument checking and parsing goes here
 
+    // Data Structures initialisation
+    grammar Grammar;
+    tokenStream* TokenStreamPointer;
+    parseTree* ParseTree;
+    typeExpressionTable TypeExpressionTable;
     // Menu
     int menu_choice = 0;
     do {
@@ -24,18 +32,32 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 1:{
+                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function    
+                readGrammar(GRAMMAR_FILE_PATH, Grammar);
+                tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
+                createParseTree(ParseTree, TokenStreamPointer, Grammar);
+
                 printf ("Parse tree creation: yet to be implemented\n\n");
                 break;
             }
             case 2:{
+                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
+                traverseParseTree(ParseTree, TypeExpressionTable);
+
                 printf ("Parse tree traversal: yet to be implemented\n\n");
                 break;
             }
             case 3:{
+                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
+                printParseTree(ParseTree);
+
                 printf ("Parse tree printing: yet to be implemented\n\n");
                 break;
             }
             case 4:{
+                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
+                printTypeExpressionTable(TypeExpressionTable);
+                
                 printf ("typeExpressionTable printing: yet to be implemented\n\n");
                 break;
             }
