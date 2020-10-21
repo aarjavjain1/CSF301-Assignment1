@@ -8,10 +8,16 @@ Data Structures:
     3. parseTree
     4. typeExpressionTable
 */
-#ifndef IMPORTANT_CONSTANTS
-#define IMPORTATN_CONSTANTS
+
+//////////////////////////////DATA STRUCTURES////////////////////////////////////////////
+
+#ifndef DATA_STRUCTURE_SIZES
+#define DATA_STRUCTURE_SIZES
     #define MAX_SIZE_OF_GRAMMAR_WORDS 40
     #define NUMBER_OF_GRAMMAR_RULES 30
+    #define MAX_SIZE_OF_TOKEN_NAME MAX_SIZE_OF_GRAMMAR_WORDS
+    #define MAX_SIZE_OF_INDENTIFIER 21
+    #define MAX_SIZE_OF_LEXEME MAX_SIZE_OF_INDENTIFIER
 #endif
 
 #ifndef DATA_STRUCTURES
@@ -26,8 +32,12 @@ Data Structures:
     }grammarNode;
 
     // Data Structure: tokenStream 
+    // TODO: Modify tokenName to be an enumeration
     typedef struct tokenStreamStruct{
-        int data;
+        char tokenName[MAX_SIZE_OF_TOKEN_NAME];
+        char lexeme[MAX_SIZE_OF_LEXEME];
+        int lineNumber;
+        struct tokenStreamStruct *next;
     }tokenStream;
 
     // Data Structure: parseTree 
@@ -40,6 +50,9 @@ Data Structures:
         int data;
     }typeExpressionTable;
 #endif
+
+
+////////////////////////////FUNCTION PROTOTYPES//////////////////////////////////////////
 
 // Function Prototype: readGrammar( “grammar.txt”, grammar G)
 int readGrammar (char* grammarFilePath,  grammarNode* G);

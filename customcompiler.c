@@ -1,5 +1,5 @@
 /*
-This file implements all the necessary functions for the compiler to work
+This file implements all the necessary functions for the compiler to work.
 */
 
 #include <stdio.h>
