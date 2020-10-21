@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
     // Argument checking and parsing goes here
 
     // Data Structures initialisation
-    grammarNode Grammar[NUMBER_OF_GRAMMAR_RULES];
+    grammarNode* Grammar[NUMBER_OF_GRAMMAR_RULES];
     tokenStream* TokenStreamPointer = NULL;
     parseTree* ParseTree = NULL;
     typeExpressionTable TypeExpressionTable;
