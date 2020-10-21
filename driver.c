@@ -1,8 +1,12 @@
 #include <stdio.h>
 
+#include "customcompiler.h"
+
 int main(int argc, char* argv[]){
+    // TODO
+    // Argument checking and parsing goes here
 
-
+    // Menu
     int menu_choice = 0;
     do {
         printf ("Please choose an option:\n");
