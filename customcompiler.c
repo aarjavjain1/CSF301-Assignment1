@@ -7,7 +7,7 @@ This file implements all the necessary functions for the compiler to work
 #include "customcompiler.h"
 
 // Function Definition: readGrammar( “grammar.txt”, grammar G)
-int readGrammar (char* grammarFilePath,  grammar G){
+int readGrammar (char* grammarFilePath,  grammarNode* G){
     printf ("Inside readGrammar.\n");
     return 0;
 }
@@ -19,7 +19,7 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
 }
 
 // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G){
+int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
     printf ("Inside createParseTree.\n");
     return 0;
 }

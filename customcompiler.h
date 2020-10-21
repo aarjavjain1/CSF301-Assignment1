@@ -8,15 +8,22 @@ Data Structures:
     3. parseTree
     4. typeExpressionTable
 */
+#ifndef IMPORTANT_CONSTANTS
+#define IMPORTATN_CONSTANTS
+    #define MAX_SIZE_OF_GRAMMAR_WORDS 40
+    #define NUMBER_OF_GRAMMAR_RULES 30
+#endif
 
 #ifndef DATA_STRUCTURES
 #define DATA_STRUCTURES
     // TODO: Data Structures
 
     // Data Structure: grammar 
-    typedef struct grammarStruct{
-        int data;
-    }grammar;
+    // Here we define grammarNode. The grammer is an array of these grammarNodes, as declared in driver.c
+    typedef struct grammarNodeStruct{
+        char grammarWord[MAX_SIZE_OF_GRAMMAR_WORDS];
+        struct grammarNodeStruct* next;
+    }grammarNode;
 
     // Data Structure: tokenStream 
     typedef struct tokenStreamStruct{
@@ -35,13 +42,13 @@ Data Structures:
 #endif
 
 // Function Prototype: readGrammar( “grammar.txt”, grammar G)
-int readGrammar (char* grammarFilePath,  grammar G);
+int readGrammar (char* grammarFilePath,  grammarNode* G);
 
 // Function Prototype: tokeniseSourcecode(  “sourcecode.txt”,  tokenStream  *s)
 int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
 
 // Function Prototype: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G);
+int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G);
 
 // Function Prototype: traverseParseTree (parseTree *t, typeExpressionTable T)
 int traverseParseTree (parseTree *t, typeExpressionTable T);
