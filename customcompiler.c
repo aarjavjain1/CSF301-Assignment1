@@ -126,8 +126,29 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
     //
 
     stack st;
-    stack_push(st, PROGRAM);
-    
+    stack_push(st, DOLLAR);
+    stack_push(st, start);
+    t = malloc(sizeof(parseTree));
+    parseTree* current = t;
+    current->next = NULL;
+    current->isTerminal = false;
+    current->lexeme = NULL;
+    current->lineNumber = 1;
+    current->symbolName = "start";
+    current->tokenName = NULL;
+    tokenStream currentToken = *s;
+
+    while (stack_top(st) != DOLLAR){
+        if ((stack_top(st).terminal == 1) && strcmp(stack_top(st), currentToken.lexeme)){
+            st_pop(st);
+            current = parseTreeInsert(current, currentToken);
+            current = parseTreeGetCurrent(t);
+            currentToken = currentToken->next;
+        }
+        else if (stack_top(st).terminal == 0){
+            
+        }
+    }
 
     return 0;
 }
