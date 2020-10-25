@@ -23,7 +23,7 @@ int main(int argc, char* argv[]){
         printf ("2. Traverse the parse tree to construct typeExpressionTable and print errors\n");
         printf ("3. Print parse tree in the specified format\n");
         printf ("4. Print typeExpressionTable in the specified format.\n");
-        
+
         scanf ("%d", &menu_choice);
 
         switch (menu_choice){
@@ -32,10 +32,10 @@ int main(int argc, char* argv[]){
                 break;
             }
             case 1:{
-                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function    
+                // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
                 readGrammar(GRAMMAR_FILE_PATH, Grammar);
                 tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
-                createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                // createParseTree(ParseTree, TokenStreamPointer, Grammar);
 
                 printf ("Parse tree creation: yet to be implemented\n\n");
                 break;
@@ -57,14 +57,14 @@ int main(int argc, char* argv[]){
             case 4:{
                 // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
                 printTypeExpressionTable(TypeExpressionTable);
-                
+
                 printf ("typeExpressionTable printing: yet to be implemented\n\n");
                 break;
             }
             default:{
                 printf("Please choose a valid option.\n\n");
                 break;
-            }       
+            }
         }
     }while(menu_choice != 0);
 
