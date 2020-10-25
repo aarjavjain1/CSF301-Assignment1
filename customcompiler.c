@@ -116,7 +116,19 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
 
 // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
 int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
-    printf ("Inside createParseTree.\n");
+    // initiate stack
+    // fill start in stack
+    // while loop 
+    //  check if terminal
+    //      pop from stack and add to parse tree
+    // check if non terminal
+    //      pop from stack and add to parse tree and push rhs of grammar rule to stack
+    //
+
+    stack st;
+    stack_push(st, PROGRAM);
+    
+
     return 0;
 }
 

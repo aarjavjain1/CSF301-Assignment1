@@ -27,27 +27,36 @@ Data Structures:
     // Data Structure: grammar
     // Here we define grammarNode. The grammer is an array of these grammarNodes, as declared in driver.c
     typedef struct grammarNodeStruct{
-        char grammarWord[MAX_SIZE_OF_GRAMMAR_WORDS];
+        char *grammarWord;
         struct grammarNodeStruct* next;
     }grammarNode;
 
     // Data Structure: tokenStream
     // TODO: Modify tokenName to be an enumeration
     typedef struct tokenStreamStruct{
-        char tokenName[MAX_SIZE_OF_TOKEN_NAME];
-        char lexeme[MAX_SIZE_OF_LEXEME];
+        char *tokenName;
+        char *lexeme;
         int lineNumber;
         struct tokenStreamStruct *next;
     }tokenStream;
 
     // Data Structure: parseTree
     typedef struct parseTreeStruct{
-        int data;
+        // data items
+        char *lexeme;
+        char *tokenName;
+        int isTerminal;
+        int lineNumber;
+        grammarNode* grammarRuleUsed;
+        char *symbolName;
+        // next pointer
+        parseTree *next;
     }parseTree;
 
     // Data Structure: typeExpressionTable
     typedef struct typeExpressionTableStruct{
         int data;
+
     }typeExpressionTable;
 #endif
 
