@@ -81,6 +81,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "OP_PLUS");
                 strcpy(new->lexeme, "+");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -91,6 +92,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "OP_MINUS");
                 strcpy(new->lexeme, "-");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -101,6 +103,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "OP_DIV");
                 strcpy(new->lexeme, "/");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -111,6 +114,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "LSQUARE");
                 strcpy(new->lexeme, "[");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -121,6 +125,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "RSQUARE");
                 strcpy(new->lexeme, "]");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -131,6 +136,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "LCURLY");
                 strcpy(new->lexeme, "{");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -141,6 +147,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "RCURLY");
                 strcpy(new->lexeme, "}");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -151,6 +158,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "SEMICOLON");
                 strcpy(new->lexeme, ";");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -161,6 +169,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "COMMA");
                 strcpy(new->lexeme, ",");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -171,6 +180,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "EQ");
                 strcpy(new->lexeme, "=");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -181,6 +191,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "COLON");
                 strcpy(new->lexeme, ":");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -192,6 +203,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "OP_MULT");
                 strcpy(new->lexeme, "*");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -204,7 +216,7 @@ tokenStream* get_token(char* token,int* line_count)
                 new->tokenName = "DOLLAR";
         }
     }
-    new->lexeme = (char *) malloc (sizeof(char) * strlen(token));
+    new->lexeme = (char *) malloc (sizeof(char) * (strlen(token) + 1));
 
     strcpy(new->lexeme, token);
     new->lineNumber = *line_count;
@@ -281,7 +293,7 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     char buffer[MAX_LEN];
     // -1 to allow room for NULL terminator for really long string
     int line_num = 0;
-    tokenStream* temp = (tokenStream*)malloc(sizeof(tokenStream));
+    tokenStream* temp = NULL;
     tokenStream* head = NULL;
     tokenStream* prev = NULL;
 
@@ -313,44 +325,44 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     return 0;
 }
 
-// Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
-    // initiate stack
-    // fill start in stack
-    // while loop 
-    //  check if terminal
-    //      pop from stack and add to parse tree
-    // check if non terminal
-    //      pop from stack and add to parse tree and push rhs of grammar rule to stack
-    //
+// // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
+// int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
+//     // initiate stack
+//     // fill start in stack
+//     // while loop 
+//     //  check if terminal
+//     //      pop from stack and add to parse tree
+//     // check if non terminal
+//     //      pop from stack and add to parse tree and push rhs of grammar rule to stack
+//     //
 
-    stack st;
-    stack_push(st, DOLLAR);
-    stack_push(st, start);
-    t = malloc(sizeof(parseTree));
-    parseTree* current = t;
-    current->next = NULL;
-    current->isTerminal = false;
-    current->lexeme = NULL;
-    current->lineNumber = 1;
-    current->symbolName = "start";
-    current->tokenName = NULL;
-    tokenStream currentToken = *s;
+//     stack st;
+//     stack_push(st, DOLLAR);
+//     stack_push(st, start);
+//     t = malloc(sizeof(parseTree));
+//     parseTree* current = t;
+//     current->next = NULL;
+//     current->isTerminal = false;
+//     current->lexeme = NULL;
+//     current->lineNumber = 1;
+//     current->symbolName = "start";
+//     current->tokenName = NULL;
+//     tokenStream currentToken = *s;
 
-    while (stack_top(st) != DOLLAR){
-        if ((stack_top(st).terminal == 1) && strcmp(stack_top(st), currentToken.lexeme)){
-            st_pop(st);
-            current = parseTreeInsert(current, currentToken);
-            current = parseTreeGetCurrent(t);
-            currentToken = currentToken->next;
-        }
-        else if (stack_top(st).terminal == 0){
+//     while (stack_top(st) != DOLLAR){
+//         if ((stack_top(st).terminal == 1) && strcmp(stack_top(st), currentToken.lexeme)){
+//             st_pop(st);
+//             current = parseTreeInsert(current, currentToken);
+//             current = parseTreeGetCurrent(t);
+//             currentToken = currentToken->next;
+//         }
+//         else if (stack_top(st).terminal == 0){
             
-        }
-    }
+//         }
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
 // Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
 int traverseParseTree (parseTree *t, typeExpressionTable T){

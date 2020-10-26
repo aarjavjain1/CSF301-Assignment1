@@ -50,7 +50,7 @@ Data Structures:
         grammarNode* grammarRuleUsed;
         char *symbolName;
         // next pointer
-        parseTree *next;
+        struct parseTreeStruct *next;
     }parseTree;
 
     // Data Structure: typeExpressionTable
