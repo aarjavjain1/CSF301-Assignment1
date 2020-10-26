@@ -325,6 +325,52 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     return 0;
 }
 
+int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
+    stack st;
+    stack_push(st, "DOLLAR");
+    stack_pushrhs(st, G[grammarRuleNum]);
+
+    while (!strcmp(stack_top(st), "DOLLAR")){
+        if ((stack_top(st).isTerminal == 1) && !strcmp(stack_top(st).str, currentToken->lexeme)){
+            stack_pop(st);
+            currentToken = currentToken->next;
+        }
+        else if (stack_top(st).isTerminal == 0){
+            // loop over grammar, for possible rules, check possility using backtracking function.
+            int ruleSelectedFlag = 0;
+            for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+                if (!strcmp(G[i]->grammarWord, stack_top(st).str) && !ruleSelectedFlag){
+                    if (predictRule(G[i], G, currentToken)){
+                        ruleSelectedFlag = 1;
+                        stack_pop(st);
+                        stack_pushrhs(st, G[i]);
+                    }
+                }
+            }
+            if (!ruleSelectedFlag)
+                return 0;
+        }
+        else
+            return 0;
+    }
+    return 0;
+}
+
+void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
+    int childToPopulate = 0;
+    while (Gi->next!=NULL){
+        Gi = Gi->next;
+        int terminal = isGrammarWordTerminal(Gi->grammarWord);
+        current->children[childToPopulate] = (parseTree*)malloc(sizeof(parseTree));
+        current->children[childToPopulate]->isTerminal = terminal;
+        if (terminal){
+            current->children[childToPopulate]->lexeme = Gi->grammarWord;
+            current->children[childToPopulate]->lineNumber = 
+        }
+        
+    }
+}
+
 // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
 int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     // initiate stack
@@ -352,18 +398,18 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     tokenStream* currentToken = s;
 
     while (!strcmp(stack_top(st), "DOLLAR")){
-        if ((stack_top(st).terminal == 1) && !strcmp(stack_top(st), currentToken->lexeme)){
+        if ((stack_top(st).isTerminal == 1) && !strcmp(stack_top(st).str, currentToken->lexeme)){
             stack_pop(st);
             current = parseTreeInsert(current, currentToken);
             current = parseTreeGetCurrent(t);
             currentToken = currentToken->next;
         }
-        else if (stack_top(st).terminal == 0){
+        else if (stack_top(st).isTerminal == 0){
             // loop over grammar, for possible rules, check possility using backtracking function.
             int ruleSelectedFlag = 0;
             for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
-                if (!strcmp(G[i]->grammarWord, stack_top(st))){
-                    if (predictRule(G[i], currentToken)){
+                if (!strcmp(G[i]->grammarWord, stack_top(st).str) && !ruleSelectedFlag){
+                    if (predictRule(i, G, currentToken)){
                         ruleSelectedFlag = 1;
                         stack_pop(st);
                         stack_pushrhs(st, G[i]);
