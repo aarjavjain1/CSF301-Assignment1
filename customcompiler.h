@@ -14,9 +14,10 @@ Data Structures:
 #ifndef DATA_STRUCTURE_SIZES
 #define DATA_STRUCTURE_SIZES
     #define MAX_SIZE_OF_GRAMMAR_WORDS 40
-    #define NUMBER_OF_GRAMMAR_RULES 56
+    #define NUMBER_OF_GRAMMAR_RULES 59
     #define MAX_SIZE_OF_TOKEN_NAME MAX_SIZE_OF_GRAMMAR_WORDS
     #define MAX_SIZE_OF_INDENTIFIER 21
+    #define MAX_PARSE_TREE_CHILDREN 15
     #define MAX_SIZE_OF_LEXEME MAX_SIZE_OF_INDENTIFIER
 #endif
 
@@ -50,7 +51,7 @@ Data Structures:
         grammarNode* grammarRuleUsed;
         char *symbolName;
         // next pointer
-        struct parseTreeStruct *next;
+        struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
     }parseTree;
 
     // Data Structure: typeExpressionTable
@@ -71,7 +72,7 @@ int readGrammar (char* grammarFilePath,  grammarNode** G);
 int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
 
 // Function Prototype: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G);
+int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G);
 
 // Function Prototype: traverseParseTree (parseTree *t, typeExpressionTable T)
 int traverseParseTree (parseTree *t, typeExpressionTable T);

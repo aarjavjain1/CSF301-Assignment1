@@ -325,44 +325,64 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     return 0;
 }
 
-// // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-// int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode*  G){
-//     // initiate stack
-//     // fill start in stack
-//     // while loop 
-//     //  check if terminal
-//     //      pop from stack and add to parse tree
-//     // check if non terminal
-//     //      pop from stack and add to parse tree and push rhs of grammar rule to stack
-//     //
+// Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
+int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
+    // initiate stack
+    // fill start in stack
+    // while loop 
+    //  check if terminal
+    //      pop from stack and add to parse tree
+    // check if non terminal
+    //      pop from stack and add to parse tree and push rhs of grammar rule to stack
+    //
+    // pseudocode if we have parsing table (M[X][a]): https://www.tutorialspoint.com/compiler_design/compiler_design_top_down_parser.htm
+    
+    stack st;
+    stack_push(st, "DOLLAR");
+    stack_push(st, "start");
+    t = malloc(sizeof(parseTree));
+    parseTree* current = t;
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
+        current->children[i] = NULL;
+    current->isTerminal = false;
+    current->lexeme = NULL;
+    current->lineNumber = 1;
+    current->symbolName = "start";
+    current->tokenName = NULL;
+    tokenStream* currentToken = s;
 
-//     stack st;
-//     stack_push(st, DOLLAR);
-//     stack_push(st, start);
-//     t = malloc(sizeof(parseTree));
-//     parseTree* current = t;
-//     current->next = NULL;
-//     current->isTerminal = false;
-//     current->lexeme = NULL;
-//     current->lineNumber = 1;
-//     current->symbolName = "start";
-//     current->tokenName = NULL;
-//     tokenStream currentToken = *s;
+    while (!strcmp(stack_top(st), "DOLLAR")){
+        if ((stack_top(st).terminal == 1) && !strcmp(stack_top(st), currentToken->lexeme)){
+            stack_pop(st);
+            current = parseTreeInsert(current, currentToken);
+            current = parseTreeGetCurrent(t);
+            currentToken = currentToken->next;
+        }
+        else if (stack_top(st).terminal == 0){
+            // loop over grammar, for possible rules, check possility using backtracking function.
+            int ruleSelectedFlag = 0;
+            for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+                if (!strcmp(G[i]->grammarWord, stack_top(st))){
+                    if (predictRule(G[i], currentToken)){
+                        ruleSelectedFlag = 1;
+                        stack_pop(st);
+                        stack_pushrhs(st, G[i]);
+                        populateChildrenGrammarNode(current, G[i]);
+                        current = current->children[0];
+                    }
+                }
+            }
+            if (!ruleSelectedFlag)
+                printf ("No rule Selected, Some error present\n");
+        }
+        else
+            printf("Terminal at top of stack, but doesn't match, some problem exists\n");
+    }
 
-//     while (stack_top(st) != DOLLAR){
-//         if ((stack_top(st).terminal == 1) && strcmp(stack_top(st), currentToken.lexeme)){
-//             st_pop(st);
-//             current = parseTreeInsert(current, currentToken);
-//             current = parseTreeGetCurrent(t);
-//             currentToken = currentToken->next;
-//         }
-//         else if (stack_top(st).terminal == 0){
-            
-//         }
-//     }
+    printf ("Parse tree created.\n");
 
-//     return 0;
-// }
+    return 0;
+}
 
 // Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
 int traverseParseTree (parseTree *t, typeExpressionTable T){
