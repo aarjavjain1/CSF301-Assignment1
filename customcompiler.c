@@ -224,7 +224,61 @@ tokenStream* get_token(char* token,int* line_count)
     return new;
 }
 
+stack* stack_top(stack* root)
+{
+    if (isEmpty(root))
+        return NULL;
+    return root;
+}
 
+
+int isEmpty(stack* root)
+{
+    return !root;
+}
+
+void stack_pop(stack* root)
+{
+    if (isEmpty(root))
+      return NULL;
+    stack* temp = root;
+    root = (root)->next;
+    return temp;
+
+}
+
+int isGrammarWordTerminal(char* str){
+  if (str[0] >= 'A' && str[0]<= 'Z')
+    return 1;
+  else
+    return 0;
+}
+
+stack* newNode(char* str)
+{
+    stack* stackNode = (stack*)malloc(sizeof(stack));
+    stackNode->str = (char*)(malloc(sizeof(char)*strlen(str)));
+    stackNode->str = str;
+    stackNode->terminal = isGrammarWordTerminal(str);
+    stackNode->next = NULL;
+    return stackNode;
+}
+
+void stack_push(stack* root, char* str){
+    stack* stackNode = newNode(str);
+    stackNode->next = root;
+    root = stackNode;
+    return;
+}
+
+void stack_pushrhs(stack* root, grammarNode* G)
+{
+    if (G == NULL)
+        return;
+    else
+        stack_push(root, G->grammarWord);
+        stack_pushrhs(root,G->next);
+}
 
 int readGrammar (char* grammarFilePath,  grammarNode** G){
     printf ("Inside readGrammar.\n");
@@ -329,14 +383,14 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
 int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     // initiate stack
     // fill start in stack
-    // while loop 
+    // while loop
     //  check if terminal
     //      pop from stack and add to parse tree
     // check if non terminal
     //      pop from stack and add to parse tree and push rhs of grammar rule to stack
     //
     // pseudocode if we have parsing table (M[X][a]): https://www.tutorialspoint.com/compiler_design/compiler_design_top_down_parser.htm
-    
+
     stack st;
     stack_push(st, "DOLLAR");
     stack_push(st, "start");

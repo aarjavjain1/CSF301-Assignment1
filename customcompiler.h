@@ -60,6 +60,11 @@ Data Structures:
 
     }typeExpressionTable;
 
+    typedef struct StackNode {
+        char* str;
+        int terminal;
+        struct StackNode* next;
+    } stack;
 #endif
 
 
