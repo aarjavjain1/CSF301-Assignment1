@@ -44,8 +44,8 @@ int main(int argc, char* argv[]){
                 // for (int i = 0; i<NUMBER_OF_GRAMMAR_RULES; i++){
                 //     printf("%d", i);print_grammar_rule(Grammar[i]);
                 // }
-                // createParseTree(ParseTree, TokenStreamPointer, Grammar);
-                
+                createParseTree(ParseTree, TokenStreamPointer, Grammar);
+
                 printf ("Parse tree creation works\n\n");
                 break;
             }

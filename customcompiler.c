@@ -68,7 +68,6 @@ char *trimwhitespace(char *str)
 tokenStream* get_token(char* token,int* line_count)
 {
     tokenStream *new = (tokenStream *) malloc(sizeof(tokenStream));
-    token = trimwhitespace(token);
     new->tokenName = (char *) malloc (sizeof(char) * 100);
     if (search(token) == 1){
       // printf("NICHT\n");
@@ -351,13 +350,17 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
       return 1;
     }
 
-    char buffer[MAX_LEN];
+    char *buffer = (char*)malloc(sizeof(char)*MAX_LEN);
+
     int line_num = 0;
     while (fgets(buffer, MAX_LEN - 1, fp))
     {
         // Remove trailing newline
         buffer[strcspn(buffer, "\n")] = 0;
+        buffer = trimwhitespace(buffer);
+
         token = strtok(buffer, " ");
+        // printf("lol\n");
         grammarNode * temp = (grammarNode*)malloc(sizeof(grammarNode));
         grammarNode * head = temp;
         temp->grammarWord = (char *)malloc(sizeof(char)*strlen(token));
@@ -382,15 +385,15 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
         // printf("GRAMMARWORD %s\n",G[line_num++]->grammarWord);
     }
     fclose(fp);
-    for(int i = 0; i< NUMBER_OF_GRAMMAR_RULES; i++){
-        // printf("%d",i);
-        grammarNode* t = G[i];
-        while (t!= NULL){
-          printf("%s\t",t->grammarWord);
-          t = t->next;
-        }
-        printf("\n");
-    }
+    // for(int i = 0; i< NUMBER_OF_GRAMMAR_RULES; i++){
+    //     // printf("%d",i);
+    //     grammarNode* t = G[i];
+    //     while (t!= NULL){
+    //       printf("%s\t",t->grammarWord);
+    //       t = t->next;
+    //     }
+    //     printf("\n");
+    // }
     return 0;
 }
 
