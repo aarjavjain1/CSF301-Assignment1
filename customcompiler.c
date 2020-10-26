@@ -383,18 +383,18 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
     stack* st;
     stack_push(st, "DOLLAR");
     stack_pushrhs(st, G[grammarRuleNum]);
-
+    tokenStream* temp = currentToken;
     while (!strcmp(stack_top(st)->str, "DOLLAR")){
-        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->lexeme)){
+        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, temp->lexeme)){
             stack_pop(st);
-            currentToken = currentToken->next;
+            temp = temp->next;
         }
         else if (stack_top(st)->terminal == 0){
             // loop over grammar, for possible rules, check possility using backtracking function.
             int ruleSelectedFlag = 0;
             for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
                 if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
-                    if (predictRule(G[i], G, currentToken)){
+                    if (predictRule(G[i], G, temp)){
                         ruleSelectedFlag = 1;
                         stack_pop(st);
                         stack_pushrhs(st, G[i]);
@@ -407,7 +407,7 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
         else
             return 0;
     }
-    return 0;
+    return 1;
 }
 
 parseTree* parseTreeGetCurrent(parseTree* t){
@@ -461,7 +461,7 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     current->tokenName = NULL;
     tokenStream* currentToken = s;
 
-    while (!strcmp(stack_top(st), "DOLLAR")){
+    while (!strcmp(stack_top(st)->str, "DOLLAR")){
         if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->lexeme)){
             stack_pop(st);
             current->lexeme = currentToken->lexeme;
