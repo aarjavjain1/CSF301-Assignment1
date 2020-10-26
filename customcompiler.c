@@ -575,10 +575,10 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     int debugCounter = 0;
     while (strcmp(stack_top(st)->str, "DOLLAR")){
         {
-            printf ("%d stats at big while --- ", debugCounter);
-            printf("current: %llu\t", current);
-            printf("token: %s\t", currentToken->tokenName);
-            printf("lexeme(token): %s\n", currentToken->lexeme);
+            // printf ("%d stats at big while --- ", debugCounter);
+            // printf("current: %llu\t", current);
+            // printf("token: %s\t", currentToken->tokenName);
+            // printf("lexeme(token): %s\n", currentToken->lexeme);
             // printf("stack: ");(st);
         }
         if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->tokenName)){
