@@ -3,13 +3,12 @@ colon
 list
 of
 variables
+semicolon
 array
 integer
-semicolon
 jagged
 alpha
 underscore
-epsilon
 num
 boolean
 real
@@ -18,7 +17,7 @@ dot
 rsquare
 number
 r1
-size
+gsize
 values
 lcurly
 rcurly
@@ -26,5 +25,9 @@ equals
 op_or
 op_and
 op_plus
+op_minus
 op_mult
 op_div
+program
+lsimple
+rsimple

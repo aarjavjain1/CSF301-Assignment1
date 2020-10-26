@@ -45,9 +45,30 @@ int search(char* token)
   return 0;
 }
 
+char *trimwhitespace(char *str)
+{
+  char *end;
+
+  // Trim leading space
+  while(isspace((unsigned char)*str)) str++;
+
+  if(*str == 0)  // All spaces?
+    return str;
+
+  // Trim trailing space
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
+
+  // Write new null terminator character
+  end[1] = '\0';
+
+  return str;
+}
+
 tokenStream* get_token(char* token,int* line_count)
 {
     tokenStream *new = (tokenStream *) malloc(sizeof(tokenStream));
+    token = trimwhitespace(token);
     new->tokenName = (char *) malloc (sizeof(char) * 100);
     if (search(token) == 1){
       // printf("NICHT\n");
@@ -59,6 +80,8 @@ tokenStream* get_token(char* token,int* line_count)
     }
     else if (!strcmp(token, "R1"))
         strcpy(new->tokenName, "R1");
+    else if (!strcmp(token, "size"))
+        strcpy(new->tokenName, "GSIZE");
     else if (isVariable(token))
         strcpy(new->tokenName,"VAR");
     else if(isNumber(token))
@@ -147,6 +170,26 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->lexeme, "}");
                 new->lineNumber = *line_count;
                 new->next = NULL;
+                return new;
+                break;
+            }
+            case '(':
+            {
+                new->tokenName = (char *) malloc (sizeof(char) * strlen("LSIMPLE"));
+                new->lexeme = (char *) malloc (sizeof(char) * strlen("("));
+                strcpy(new->tokenName, "LSIMPLE");
+                strcpy(new->lexeme, "(");
+                new->lineNumber = *line_count;
+                return new;
+                break;
+            }
+            case ')':
+            {
+                new->tokenName = (char *) malloc (sizeof(char) * strlen("RSIMPLE"));
+                new->lexeme = (char *) malloc (sizeof(char) * strlen(")"));
+                strcpy(new->tokenName, "RSIMPLE");
+                strcpy(new->lexeme, ")");
+                new->lineNumber = *line_count;
                 return new;
                 break;
             }
@@ -339,15 +382,15 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
         // printf("GRAMMARWORD %s\n",G[line_num++]->grammarWord);
     }
     fclose(fp);
-    // for(int i = 0; i< NUMBER_OF_GRAMMAR_RULES; i++){
-    //     // printf("%d",i);
-    //     grammarNode* t = G[i];
-    //     while (t!= NULL){
-    //       printf("%s\t",t->grammarWord);
-    //       t = t->next;
-    //     }
-    //     printf("\n");
-    // }
+    for(int i = 0; i< NUMBER_OF_GRAMMAR_RULES; i++){
+        // printf("%d",i);
+        grammarNode* t = G[i];
+        while (t!= NULL){
+          printf("%s\t",t->grammarWord);
+          t = t->next;
+        }
+        printf("\n");
+    }
     return 0;
 }
 
@@ -502,7 +545,7 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
 
     stack* st = NULL;
     st = stack_push(st, "DOLLAR");
-    st = stack_push(st, "start");
+    st = stack_push(st, "main_program");
     // printf ("Dollar and start pushed to stack\n");
     // tokenStream* test =s;
     // while(test != NULL){
@@ -516,7 +559,7 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     current->isTerminal = false;
     current->lexeme = NULL;
     current->lineNumber = 0;
-    current->symbolName = "start";
+    current->symbolName = "main_program";
     current->tokenName = NULL;
     current->isLeaf = 0;
     tokenStream* currentToken = s;
@@ -526,8 +569,8 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     while (strcmp(stack_top(st)->str, "DOLLAR")){
         {
             // printf ("%d main stack at big while:", debugCounter);
-            printf("stack in big while: ");print_stack(st);
-            printf("current: %llu\n", current);
+            // printf("stack in big while: ");print_stack(st);
+            // printf("current: %llu\n", current);
         }
         if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->tokenName)){
             printf("accepted terminal: %s\n", currentToken->tokenName);
@@ -572,8 +615,8 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
                     }
                 }
             }
-            if (!ruleSelectedFlag)
-                printf ("No rule Selected, Some error present\n");
+            // if (!ruleSelectedFlag)
+            //     printf ("No rule Selected, Some error present\n");
         }
         else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");

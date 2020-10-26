@@ -1,5 +1,9 @@
-start -> declaration
-start -> assignment
+main_program -> PROGRAM LSIMPLE RSIMPLE LCURLY start RCURLY
+start -> first second
+first -> declaration first
+first -> declaration
+second -> assignment second
+second -> assignment
 declaration -> DECLARE declaration_ext
 declaration_ext -> VAR COLON declaration_right_ext
 declaration_ext -> LIST OF VARIABLES var_list COLON declaration_right_ext
@@ -38,17 +42,17 @@ value_list_3 -> value_list_3 SEMICOLON mini_value_list_3
 value_list_3 -> mini_value_list_3
 mini_value_list_3 -> mini_value_list_3 NUMBER
 mini_value_list_3 -> NUMBER
-assignment -> var_bool EQUALS expression SEMICOLON
-expression -> expression OP_OR and_expression
+assignment -> VAR EQUALS expression SEMICOLON
+expression -> and_expression OP_OR expression
 expression -> and_expression
-and_expression -> and_expression OP_AND arith_expression
+and_expression -> arith_expression OP_AND and_expression
 and_expression -> arith_expression
-arith_expression -> arith_expression op_plus_minus term
+arith_expression -> term op_plus_minus arith_expression
 arith_expression -> term
-term -> term op_mult_div factor
+term -> factor op_mult_div term
 term -> factor
-factor -> id
 factor -> VAR LSQUARE inside RSQUARE
+factor -> id
 inside -> d_inside
 inside -> t_inside
 d_inside -> id id
