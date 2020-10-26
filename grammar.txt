@@ -9,11 +9,11 @@ declaration_ext -> VAR COLON declaration_right_ext
 declaration_ext -> LIST OF VARIABLES var_list COLON declaration_right_ext
 declaration_right_ext -> prim_type SEMICOLON
 declaration_right_ext -> ARRAY range_list OF INTEGER SEMICOLON
-declaration_right_ext -> JAGGED ARRAY range_list
+declaration_right_ext -> JAGGED ARRAY j_range_list
 range_list -> LSQUARE id DOT id RSQUARE range_list
 range_list -> LSQUARE id DOT id RSQUARE
-range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_2
-range_list -> range_list_3 OF INTEGER SEMICOLON index_def_list_3
+j_range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_2
+j_range_list -> range_list_3 OF INTEGER SEMICOLON index_def_list_3
 var_list -> VAR var_list
 var_list -> VAR VAR
 var -> start_char charlist
@@ -30,17 +30,17 @@ range_list_2 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE
 range_list_3 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE LSQUARE RSQUARE
 id -> VAR
 id -> NUMBER
-index_def_list_2 -> index_def_list_2 index_def_2
+index_def_list_2 -> index_def_2 index_def_list_2
 index_def_list_2 -> index_def_2
 index_def_2 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_2 RCURLY
-value_list_2 -> value_list_2 SEMICOLON NUMBER
+value_list_2 -> NUMBER SEMICOLON value_list_2
 value_list_2 -> NUMBER
-index_def_list_3 -> index_def_list_3 index_def_3
+index_def_list_3 -> index_def_3 index_def_list_3
 index_def_list_3 -> index_def_3
 index_def_3 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_3 RCURLY
-value_list_3 -> value_list_3 SEMICOLON mini_value_list_3
+value_list_3 -> mini_value_list_3 SEMICOLON value_list_3
 value_list_3 -> mini_value_list_3
-mini_value_list_3 -> mini_value_list_3 NUMBER
+mini_value_list_3 -> NUMBER mini_value_list_3
 mini_value_list_3 -> NUMBER
 assignment -> VAR EQUALS expression SEMICOLON
 expression -> and_expression OP_OR expression

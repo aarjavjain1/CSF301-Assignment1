@@ -74,6 +74,7 @@ tokenStream* get_token(char* token,int* line_count)
       char *temp_ = (char *) malloc(strlen(token) + 1);
       for (int yu=0; yu < (int) strlen(token); ++yu)
           temp_[yu] = toupper(token[yu]);
+    temp_[(int)strlen(token)] = '\0';
       //printf("token: %s\n", buff);
       strcpy(new->tokenName, temp_);
     }
@@ -179,6 +180,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "LSIMPLE");
                 strcpy(new->lexeme, "(");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -189,6 +191,7 @@ tokenStream* get_token(char* token,int* line_count)
                 strcpy(new->tokenName, "RSIMPLE");
                 strcpy(new->lexeme, ")");
                 new->lineNumber = *line_count;
+                new->next = NULL;
                 return new;
                 break;
             }
@@ -216,9 +219,9 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '=':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("EQ"));
+                new->tokenName = (char *) malloc (sizeof(char) * strlen("EQUALS"));
                 new->lexeme = (char *) malloc (sizeof(char) * strlen("="));
-                strcpy(new->tokenName, "EQ");
+                strcpy(new->tokenName, "EQUALS");
                 strcpy(new->lexeme, "=");
                 new->lineNumber = *line_count;
                 new->next = NULL;
@@ -408,7 +411,7 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     //   return 1;
     // }
 
-    char buffer[MAX_LEN];
+    char *buffer = (char* ) malloc(sizeof(char) * MAX_LEN);
     // -1 to allow room for NULL terminator for really long string
     int line_num = 0;
     tokenStream* temp = NULL;
@@ -419,6 +422,7 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     {
         // Remove trailing newline
         buffer[strcspn(buffer, "\n")] = 0;
+        buffer = trimwhitespace(buffer);
         token = strtok(buffer, " ");
        /* walk through other tokens */
         while( token != NULL) {
@@ -498,23 +502,23 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
 parseTree* parseTreeGetCurrent(parseTree* t){
     parseTree* retpointer;
     int hasChild = 0;
-    printf("exporing %d, ", t->isLeaf);
+    // printf("exporing %d, ", t->isLeaf);
     if (t->children[0] != NULL){
         hasChild = 1;
     }
-    printf("haschild: %d\n", hasChild);
+    // printf("haschild: %d\n", hasChild);
     if (hasChild==0 && t->isLeaf == 0)
         return t;
 
     for (int i = 0; i<MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i] == NULL)
             break;
-        printf("inside for child i: %d\n", i);
+        // printf("inside for child i: %d\n", i);
         retpointer = parseTreeGetCurrent(t->children[i]);
         if (retpointer != NULL)
             return retpointer;
     }
-    printf ("returning NULL\n");
+    // printf ("returning NULL\n");
     return NULL;
 }
 
@@ -571,9 +575,11 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     int debugCounter = 0;
     while (strcmp(stack_top(st)->str, "DOLLAR")){
         {
-            // printf ("%d main stack at big while:", debugCounter);
-            // printf("stack in big while: ");print_stack(st);
-            // printf("current: %llu\n", current);
+            printf ("%d stats at big while --- ", debugCounter);
+            printf("current: %llu\t", current);
+            printf("token: %s\t", currentToken->tokenName);
+            printf("lexeme(token): %s\n", currentToken->lexeme);
+            // printf("stack: ");(st);
         }
         if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->tokenName)){
             printf("accepted terminal: %s\n", currentToken->tokenName);
@@ -618,8 +624,10 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
                     }
                 }
             }
-            // if (!ruleSelectedFlag)
-            //     printf ("No rule Selected, Some error present\n");
+            if (!ruleSelectedFlag){
+                printf ("No rule Selected, Some error present\n");
+                break;
+            }
         }
         else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");
