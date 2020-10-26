@@ -34,10 +34,19 @@ int main(int argc, char* argv[]){
             case 1:{
                 // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
                 readGrammar(GRAMMAR_FILE_PATH, Grammar);
-                tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
-                // createParseTree(ParseTree, TokenStreamPointer, Grammar);
-
-                printf ("Parse tree creation: yet to be implemented\n\n");
+                TokenStreamPointer = tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
+                tokenStream* test =TokenStreamPointer;
+                // while(test != NULL){
+                // printf("%s\n",test->tokenName );
+                // test = test->next;
+                // }
+                printf ("tokenised\n");
+                // for (int i = 0; i<NUMBER_OF_GRAMMAR_RULES; i++){
+                //     printf("%d", i);print_grammar_rule(Grammar[i]);
+                // }
+                createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                
+                printf ("Parse tree creation works\n\n");
                 break;
             }
             case 2:{

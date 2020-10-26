@@ -1,15 +1,17 @@
 start -> declaration
 start -> assignment
 declaration -> DECLARE declaration_ext
-declaration_ext -> var COLON declaration_right_ext
+declaration_ext -> VAR COLON declaration_right_ext
 declaration_ext -> LIST OF VARIABLES var_list COLON declaration_right_ext
 declaration_right_ext -> prim_type SEMICOLON
 declaration_right_ext -> ARRAY range_list OF INTEGER SEMICOLON
 declaration_right_ext -> JAGGED ARRAY range_list
+range_list -> LSQUARE id DOT id RSQUARE range_list
+range_list -> LSQUARE id DOT id RSQUARE
 range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_2
 range_list -> range_list_3 OF INTEGER SEMICOLON index_def_list_3
-var_list -> var_list var
-var_list -> var var
+var_list -> VAR var_list
+var_list -> VAR VAR
 var -> start_char charlist
 start_char -> ALPHA
 start_char -> UNDERSCORE
@@ -20,11 +22,9 @@ gchar -> UNDERSCORE
 prim_type -> INTEGER
 prim_type -> BOOLEAN
 prim_type -> REAL
-range_list -> range_list LSQUARE id DOT id RSQUARE
-range_list -> LSQUARE id DOT id RSQUARE
 range_list_2 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE
 range_list_3 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE LSQUARE RSQUARE
-id -> var
+id -> VAR
 id -> NUMBER
 index_def_list_2 -> index_def_list_2 index_def_2
 index_def_list_2 -> index_def_2
@@ -48,7 +48,7 @@ arith_expression -> term
 term -> term op_mult_div factor
 term -> factor
 factor -> id
-factor -> var LSQUARE inside RSQUARE
+factor -> VAR LSQUARE inside RSQUARE
 inside -> d_inside
 inside -> t_inside
 d_inside -> id id

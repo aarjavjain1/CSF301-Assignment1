@@ -24,7 +24,6 @@ bool isVariable(char* str){
     return true;
 }
 
-
 bool isNumber(char* str){
     // printf("isNumber %s\n",str);
     for (int yu=0; yu <(int)strlen(str); ++yu){
@@ -61,7 +60,7 @@ tokenStream* get_token(char* token,int* line_count)
     else if (!strcmp(token, "R1"))
         strcpy(new->tokenName, "R1");
     else if (isVariable(token))
-        strcpy(new->tokenName,"var");
+        strcpy(new->tokenName,"VAR");
     else if(isNumber(token))
         strcpy(new->tokenName,"NUMBER");
     else if(!strcmp(token,"&&&"))
@@ -224,6 +223,11 @@ tokenStream* get_token(char* token,int* line_count)
     return new;
 }
 
+int isEmpty(stack* root)
+{
+    return !root;
+}
+
 stack* stack_top(stack* root)
 {
     if (isEmpty(root))
@@ -231,20 +235,14 @@ stack* stack_top(stack* root)
     return root;
 }
 
-
-int isEmpty(stack* root)
-{
-    return !root;
-}
-
-void stack_pop(stack* root)
+stack* stack_pop(stack* root)
 {
     if (isEmpty(root))
       return NULL;
     stack* temp = root;
-    root = (root)->next;
-    return temp;
-
+    root = root->next;
+    free(temp);
+    return root;
 }
 
 int isGrammarWordTerminal(char* str){
@@ -257,27 +255,47 @@ int isGrammarWordTerminal(char* str){
 stack* newNode(char* str)
 {
     stack* stackNode = (stack*)malloc(sizeof(stack));
-    stackNode->str = (char*)(malloc(sizeof(char)*strlen(str)));
-    stackNode->str = str;
+    stackNode->str = (char*)(malloc(sizeof(char)*(strlen(str)+1)));
+    strcpy(stackNode->str, str);
     stackNode->terminal = isGrammarWordTerminal(str);
     stackNode->next = NULL;
     return stackNode;
 }
 
-void stack_push(stack* root, char* str){
+stack* stack_push(stack* root, char* str){
     stack* stackNode = newNode(str);
     stackNode->next = root;
-    root = stackNode;
-    return;
+    // root = stackNode;
+    // printf ("end of push to stack: %s\n", str);
+    return stackNode;
 }
 
-void stack_pushrhs(stack* root, grammarNode* G)
+stack* stack_pushrhs(stack* root, grammarNode* G)
 {
     if (G == NULL)
-        return;
-    else
-        stack_push(root, G->grammarWord);
-        stack_pushrhs(root,G->next);
+        return root;
+    else{
+        // stack_push(root, G->grammarWord);
+        root = stack_pushrhs(root,G->next);
+        root = stack_push(root, G->grammarWord);
+    }
+    return root;
+}
+
+void print_stack(stack* root){
+    while (root){
+        printf ("%s -> ", root->str);
+        root = root->next;
+    }
+    printf("\n");
+}
+
+void print_grammar_rule(grammarNode* root){
+    while (root){
+        printf ("%s -> ", root->grammarWord);
+        root = root->next;
+    }
+    printf("\n");
 }
 
 int readGrammar (char* grammarFilePath,  grammarNode** G){
@@ -334,15 +352,15 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
 }
 
 // Function Definition: tokeniseSourcecode(  “sourcecode.txt”,  tokenStream  *s)
-int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
-    printf ("Inside tokeniseSourcecode.\n");
+tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
+    // printf ("Inside tokeniseSourcecode.\n");
     FILE* fp;
     char* token;
     fp = fopen(sourceCodeFilePath, "r");
-    if (fp == NULL) {
-      perror("Failed: ");
-      return 1;
-    }
+    // if (fp == NULL) {
+    //   perror("Failed: ");
+    //   return 1;
+    // }
 
     char buffer[MAX_LEN];
     // -1 to allow room for NULL terminator for really long string
@@ -372,53 +390,85 @@ int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     fclose(fp);
     s = head;
     tokenStream* test = head;
-    while(test != NULL){
-      printf("%s\n",test->tokenName );
-      test = test->next;
-    }
-    return 0;
+    // while(test != NULL){
+    //   printf("%s\n",test->tokenName );
+    //   test = test->next;
+    // }
+    return head;
 }
 
 int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
     stack* st;
-    stack_push(st, "DOLLAR");
-    stack_pushrhs(st, G[grammarRuleNum]);
+    st = stack_push(st, "DOLLAR");
+    // printf ("after dollar push, st->str: %s\n", st->str);
+    st = stack_pushrhs(st, G[grammarRuleNum]->next);
+
     tokenStream* temp = currentToken;
-    while (!strcmp(stack_top(st)->str, "DOLLAR")){
-        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, temp->lexeme)){
-            stack_pop(st);
+    while (strcmp(stack_top(st)->str, "DOLLAR")){
+        // printf("inside recursive while st: %s, lex:%s\n", st->str, temp->lexeme);
+        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, temp->tokenName)){
+            // printf("terminal detected : %s\n", st->str);
+            st = stack_pop(st);
+            // print_stack(st);
             temp = temp->next;
+            // if (st->next == NULL)
+                // printf("mast DOLLAR dikha\n");
         }
         else if (stack_top(st)->terminal == 0){
+            // printf("non terminal detected : %s\n", st->str);
             // loop over grammar, for possible rules, check possility using backtracking function.
             int ruleSelectedFlag = 0;
             for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
                 if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
-                    if (predictRule(G[i], G, temp)){
+                    {
+                        // printf ("sending grammar rule (predict): ");
+                        // print_grammar_rule(G[i]);
+                    }
+                    if (predictRule(i, G, temp)){
+                        // printf("predicted rule: \n");
+                        // printf("%s -> %s\n", G[i]->grammarWord, G[i]->next->grammarWord);
                         ruleSelectedFlag = 1;
-                        stack_pop(st);
-                        stack_pushrhs(st, G[i]);
+                        st = stack_pop(st);
+                        st = stack_pushrhs(st, G[i]->next);
+                        // printf("stack after pushrhs: ");print_stack(st);
                     }
                 }
             }
-            if (!ruleSelectedFlag)
+            if (!ruleSelectedFlag){
+                // printf("no rule found\n");
                 return 0;
+            }
         }
-        else
+        else{
+            // printf("returning 0 on st: %s, token: %s\n", st->str, temp->tokenName);
             return 0;
+        }
     }
+    // printf("returning 1 as prediction on G[i]:");
+    // print_grammar_rule(G[grammarRuleNum]);
     return 1;
 }
 
 parseTree* parseTreeGetCurrent(parseTree* t){
     parseTree* retpointer;
+    int hasChild = 0;
+    printf("exporing %d, ", t->isLeaf);
+    if (t->children[0] != NULL){
+        hasChild = 1;
+    }
+    printf("haschild: %d\n", hasChild);
+    if (hasChild==0 && t->isLeaf == 0)
+        return t;
+
     for (int i = 0; i<MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i] == NULL)
             break;
+        printf("inside for child i: %d\n", i);
         retpointer = parseTreeGetCurrent(t->children[i]);
-        if (retpointer)
+        if (retpointer != NULL)
             return retpointer;
     }
+    printf ("returning NULL\n");
     return NULL;
 }
 
@@ -431,6 +481,9 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         current->children[childToPopulate] = (parseTree*)malloc(sizeof(parseTree));
         current->children[childToPopulate]->isTerminal = terminal;
         current->children[childToPopulate]->grammarRuleUsed = NULL;
+        current->children[childToPopulate]->isLeaf = 0;
+        printf("populated %s", Gi->grammarWord);
+        childToPopulate++;
         // other fields for this node in the parse tree will be filled in createParseTree if terminal on stack is detected
     }
 }
@@ -447,9 +500,15 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     //
     // pseudocode if we have parsing table (M[X][a]): https://www.tutorialspoint.com/compiler_design/compiler_design_top_down_parser.htm
 
-    stack* st;
-    stack_push(st, "DOLLAR");
-    stack_push(st, "start");
+    stack* st = NULL;
+    st = stack_push(st, "DOLLAR");
+    st = stack_push(st, "start");
+    // printf ("Dollar and start pushed to stack\n");
+    // tokenStream* test =s;
+    // while(test != NULL){
+    //   printf("%s\n",test->tokenName );
+    //   test = test->next;
+    // }
     t = malloc(sizeof(parseTree));
     parseTree* current = t;
     for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
@@ -459,41 +518,69 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     current->lineNumber = 0;
     current->symbolName = "start";
     current->tokenName = NULL;
+    current->isLeaf = 0;
     tokenStream* currentToken = s;
-
-    while (!strcmp(stack_top(st)->str, "DOLLAR")){
-        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->lexeme)){
-            stack_pop(st);
+    // printf ("stack top se pehle\n");
+    // printf ("outside while stack top: %s\n", st->str);
+    int debugCounter = 0;
+    while (strcmp(stack_top(st)->str, "DOLLAR")){
+        {
+            // printf ("%d main stack at big while:", debugCounter);
+            printf("stack in big while: ");print_stack(st);
+            printf("current: %llu\n", current);
+        }
+        if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->tokenName)){
+            printf("accepted terminal: %s\n", currentToken->tokenName);
+            st = stack_pop(st);
             current->lexeme = currentToken->lexeme;
             current->lineNumber = currentToken->lineNumber;
             current->tokenName = currentToken->tokenName;
+            current->symbolName = currentToken->tokenName;
+            current->isLeaf = 1;
             for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
                 current->children[i] = NULL;
             current = parseTreeGetCurrent(t);
+            if (current == NULL)
+                printf("terminal ke baad diqqat\n");
             currentToken = currentToken->next;
         }
         else if (stack_top(st)->terminal == 0){
             // loop over grammar, for possible rules, check possility using backtracking function.
             int ruleSelectedFlag = 0;
             for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+                // printf("grammar rule for if : %s\n", G[i]->grammarWord);
                 if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
+                    // {
+                    //     printf ("seding grammar rule: ");
+                    //     print_grammar_rule(G[i]);
+                    // }
                     if (predictRule(i, G, currentToken)){
+                        // print_grammar_rule(G[i]);
+                        printf("got a rule yayayayayayay\n");
                         ruleSelectedFlag = 1;
-                        stack_pop(st);
-                        stack_pushrhs(st, G[i]);
+                        st = stack_pop(st);
+                        st = stack_pushrhs(st, G[i]->next);
                         current->grammarRuleUsed = G[i];
+                        current->symbolName = G[i]->grammarWord;
+                        printf("stack after rule insertion: ");print_stack(st);
                         populateChildrenGrammarNode(current, G[i]);
-                        current = current->children[0];
+                        if (current->children[0] == NULL)
+                            printf("KHALi!!!\n");
+                        current = parseTreeGetCurrent(t);
+                        if (current == NULL)
+                            printf("sachmein KHALi!!!\n");
                     }
                 }
             }
             if (!ruleSelectedFlag)
                 printf ("No rule Selected, Some error present\n");
         }
-        else
+        else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");
+            printf("st ka top: %s, token: %s", st->str, currentToken->tokenName);
+        }
     }
-
+    printParseTree(t);
     printf ("Parse tree created.\n");
 
     return 0;
@@ -507,7 +594,11 @@ int traverseParseTree (parseTree *t, typeExpressionTable T){
 
 // Function Definition: printParseTree (parseTree *t)
 int printParseTree (parseTree *t){
-    printf ("Inside printPareseTree.\n");
+    printf("Printing Tree ----  parseTreeNode: %s\n", t->symbolName);
+    for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+        if (t->children[i])
+            printParseTree(t->children[i]);
+    }
     return 0;
 }
 

@@ -50,7 +50,8 @@ Data Structures:
         int lineNumber;
         grammarNode* grammarRuleUsed;
         char *symbolName;
-        // next pointer
+        int isLeaf;
+        // child pointer
         struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
     }parseTree;
 
@@ -74,7 +75,7 @@ Data Structures:
 int readGrammar (char* grammarFilePath,  grammarNode** G);
 
 // Function Prototype: tokeniseSourcecode(  “sourcecode.txt”,  tokenStream  *s)
-int tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
+tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
 
 // Function Prototype: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
 int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G);
@@ -87,3 +88,5 @@ int printParseTree (parseTree *t);
 
 // Function Prototype: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable T);
+
+void print_grammar_rule(grammarNode* root);
