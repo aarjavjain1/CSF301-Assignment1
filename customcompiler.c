@@ -605,7 +605,7 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
 }
 
 // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
+parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
     // pseudocode if we have parsing table (M[X][a]): https://www.tutorialspoint.com/compiler_design/compiler_design_top_down_parser.htm
 
     grammarOrderNode *grammarOrder = NULL;
@@ -711,21 +711,19 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
         }
     }
     freeStackMemory(st);
-    printParseTree(t);
+    // printParseTree(t);
     printf ("Parse tree created.\n");
-
-    return 0;
-}
-
-// Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
-int traverseParseTree (parseTree *t, typeExpressionTable T){
-    printf ("Inside traverseParseTree.\n");
-    return 0;
+    return t;
 }
 
 // Function Definition: printParseTree (parseTree *t)
 int printParseTree (parseTree *t){
-    printf("Printing Tree ----  parseTreeNode: %s\n", t->symbolName);
+    printf("Printing Tree ----  parseTreeNode: %s -> ", t->symbolName);
+    for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+        if (t->children[i])
+            printf("%s\t", t->children[i]->symbolName);
+    }
+    printf("\n");
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i])
             printParseTree(t->children[i]);
@@ -733,8 +731,210 @@ int printParseTree (parseTree *t){
     return 0;
 }
 
+parseTree* parseArray[MAX_VARIABLES];
+static int parseIndex = 0;
+
+int max(int a, int b){
+    if (a > b) return a;
+    else return b;
+}
+
+int min(int a, int b){
+    if (a > b) return b;
+    else return a;
+}
+
+void recurse(parseTree *t){
+    if (t && t->isLeaf){
+        parseArray[parseIndex] = t;
+        parseIndex++;
+    } else {
+        for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++)
+            if (t->children[i])
+                recurse(t->children[i]);
+    }
+}
+
+void addDeclaration(parseTree* t, typeExpressionTable *T){
+    // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
+    for(int i = 0; i < MAX_VARIABLES; i++){
+        parseArray[i] = NULL;
+    }
+    parseIndex = 0;
+    recurse(t);
+    for (int i = 0; i < parseIndex; i++) {
+        printf("%s ", parseArray[i]->symbolName);
+    }
+    printf("\n");
+    int low_var = 200000000, high_var = -200000000, colon = -1;
+    for (int i = 0; i < parseIndex; i++) {
+        // printf("%s ", parseArray[i]->symbolName);
+        if (!strcmp(parseArray[i]->symbolName, "VAR") && colon == -1){
+            low_var = min(low_var, i);
+            high_var = max(high_var, i);
+        }
+        if (colon == -1 && !strcmp(parseArray[i]->symbolName, "COLON")){
+            colon = i;
+        }
+    }
+    // printf("%d %d %d\n", low_var, high_var, colon);
+    if (!strcmp(parseArray[colon+1]->symbolName, "INTEGER") || !strcmp(parseArray[colon+1]->symbolName, "BOOLEAN") || !strcmp(parseArray[colon+1]->symbolName, "REAL")){
+        // printf("Mai to ithhe paaji\n");
+        for (int i = low_var; i <= high_var; i++){
+            typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            strcpy(temp->name, parseArray[i]->lexeme);
+            temp->type = primitive;
+            temp->array_type = NA;
+            temp->exp = (expression*)malloc(sizeof(expression));
+            temp->exp->a = (prim*)malloc(sizeof(prim));
+            temp->exp->a->basicElementType = (char*)malloc(strlen(parseArray[colon+1]->symbolName));
+            temp->next = NULL;
+            strcpy(temp->exp->a->basicElementType,parseArray[colon+1]->symbolName);
+            if (T == NULL) T = temp;
+            else {
+                typeExpressionTable* l = T;
+                while(l->next) l = l->next;
+                l->next = temp;
+            }
+        }
+    }
+    else if (!strcmp(parseArray[colon+1]->symbolName, "ARRAY")){
+        for (int i = low_var; i <= high_var; i++){
+            typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            strcpy(temp->name, parseArray[i]->lexeme);
+            temp->type = rect_array;
+            temp->next = NULL;
+            temp->exp = (expression*)malloc(sizeof(expression));
+            temp->exp->b = (rect*)malloc(sizeof(rect));
+            temp->exp->b->basicElementType = (char*)malloc(sizeof("INTEGER")+1);
+            temp->exp->b->d = NULL;
+            strcpy(temp->exp->b->basicElementType, "INTEGER");
+            bool stat = true;
+            int dim = 0;
+            for (int i = colon+1; i < parseIndex; i++){
+                if (!strcmp(parseArray[i]->symbolName, "LSQUARE")){
+                    rect_dimension* rd = (rect_dimension*)malloc(sizeof(rect_dimension));
+                    dim++;
+                    // if ((!strcmp(parseArray[i+1]->symbolName, "VAR") || !strcmp(parseArray[i+1]->symbolName, "NUMBER")) && (!strcmp(parseArray[i+3]->symbolName, "VAR") || !strcmp(parseArray[i+3]->symbolName, "NUMBER"))) {
+                        // if (!strcmp(parseArray[i+1], "VAR") || !strcmp(parseArray[i+3], "VAR")) stat = false;
+                    if (!strcmp(parseArray[i+1]->symbolName, "VAR"))
+                        stat = false;
+                    rd->low = (char*)malloc(strlen(parseArray[i+1]->lexeme));
+                    strcpy(rd->low, parseArray[i+1]->lexeme);
+
+                    if (!strcmp(parseArray[i+3]->symbolName, "VAR"))
+                        stat = false;
+                    rd->high = (char*)malloc(strlen(parseArray[i+3]->lexeme));
+                    strcpy(rd->high, parseArray[i+3]->lexeme);
+                    rd->next = NULL;
+                    if (temp->exp->b->d == NULL) temp->exp->b->d = rd;
+                    else {
+                        rect_dimension* l = temp->exp->b->d;
+                        while(l->next) l = l->next;
+                        l->next = rd;
+                    }
+                    // }
+                }
+            }
+            if (stat) temp->array_type = stat;
+            else temp->array_type = dyn;
+            temp->exp->b->dimensions = dim;
+            if (T == NULL) T = temp;
+            else {
+                typeExpressionTable* l = T;
+                while(l->next) l = l->next;
+                l->next = temp;
+            }
+        }
+    }
+    else if (!strcmp(parseArray[colon+1]->symbolName, "JAGGED")){
+        for (int i = low_var; i <= high_var; i++){
+            typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            strcpy(temp->name, parseArray[i]->lexeme);
+            temp->type = jagged_array;
+            temp->array_type = NA;
+            temp->next = NULL;
+            temp->exp = (expression*)malloc(sizeof(expression));
+            temp->exp->c = (jagged*)malloc(sizeof(jagged));
+            temp->exp->b->basicElementType = (char*)malloc(sizeof("INTEGER")+1);
+            strcpy(temp->exp->b->basicElementType, "INTEGER");
+            temp->exp->b->d = NULL;
+            int dim = 0;
+            for (int i = colon+1; i < parseIndex; i++){
+                if (!strcmp(parseArray[i]->symbolName, "LSQUARE")){
+                    rect_dimension* rd = (rect_dimension*)malloc(sizeof(rect_dimension));
+                    dim++;
+                    // if ((!strcmp(parseArray[i+1]->symbolName, "VAR") || !strcmp(parseArray[i+1]->symbolName, "NUMBER")) && (!strcmp(parseArray[i+3]->symbolName, "VAR") || !strcmp(parseArray[i+3]->symbolName, "NUMBER"))) {
+                        // if (!strcmp(parseArray[i+1], "VAR") || !strcmp(parseArray[i+3], "VAR")) stat = false;
+                    rd->low = (char*)malloc(strlen(parseArray[i+1]->lexeme));
+                    strcpy(rd->low, parseArray[i+1]->lexeme);
+
+                    rd->high = (char*)malloc(strlen(parseArray[i+3]->lexeme));
+                    strcpy(rd->high, parseArray[i+3]->lexeme);
+                    rd->next = NULL;
+                    if (temp->exp->b->d == NULL) temp->exp->b->d = rd;
+                    else {
+                        rect_dimension* l = temp->exp->b->d;
+                        while(l->next) l = l->next;
+                        l->next = rd;
+                    }
+                    // }
+                }
+            }
+            if (stat) temp->array_type = stat;
+            else temp->array_type = dyn;
+            temp->exp->b->dimensions = dim;
+            if (T == NULL) T = temp;
+            else {
+                typeExpressionTable* l = T;
+                while(l->next) l = l->next;
+                l->next = temp;
+            }
+        }
+    }
+    printTypeExpressionTable(T);
+
+    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+    //     if (t->children[i])
+    //         printf("%s\t", t->children[i]->symbolName);
+    // }
+    // printf("\n");
+    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+    //     if (t->children[i])
+    //         printParseTree(t->children[i]);
+    // }
+    // printf("\n");.
+    return;
+}
+
+// Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
+int traverseParseTree (parseTree *t, typeExpressionTable *T){
+    // printf ("Inside traverseParseTree.\n");
+    if (t != NULL && !strcmp(t->symbolName, "declaration")) {
+        addDeclaration(t, T);
+        return 0;
+    }
+    // if (t != NULL && !strcmp(t->symbolName, "assignment")) {
+    //     addAssignment(t, T);
+    //     return 0;
+    // }
+    for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+        if (t->children[i])
+            traverseParseTree(t->children[i], T);
+    }
+    return 0;
+}
+
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
-int printTypeExpressionTable (typeExpressionTable T){
+int printTypeExpressionTable (typeExpressionTable *T){
     printf ("Inside printTypeExpressionTable.\n");
+    typeExpressionTable* l = T;
+    while(l){
+        printf("%s\n", l->name);
+        l = l->next;
+    }
     return 0;
 }

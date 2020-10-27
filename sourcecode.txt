@@ -1,5 +1,8 @@
 program ( )
 {
-	declare list of variables new d w e2 : integer ;
+	declare list of variables p1 p2 p3 : jagged array [ 105 ..  107 ] [ ] of integer ; 
+	R1 [ 105 ]  : size 4 : values { 20  21  33 ; 102 ; 35 ; 54 }     
+	R1 [ 106 ]  : size 3 : values { 165 ; 809 ; 929 }
+	R1 [ 107 ]  : size 2 : values { 22 ; 745 } 
 	new = d * e2 + w - 76875 ;
 }

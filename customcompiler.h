@@ -19,6 +19,7 @@ Data Structures:
     #define MAX_SIZE_OF_INENTIFIER 21
     #define MAX_PARSE_TREE_CHILDREN 15
     #define MAX_SIZE_OF_LEXEME MAX_SIZE_OF_IDENTIFIER
+    #define MAX_VARIABLES 1000
 #endif
 
 #ifndef DATA_STRUCTURES
@@ -55,12 +56,6 @@ Data Structures:
         struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
     }parseTree;
 
-    // Data Structure: typeExpressionTable
-    typedef struct typeExpressionTableStruct{
-        int data;
-
-    }typeExpressionTable;
-
     typedef struct StackNode {
         char* str;
         int terminal;
@@ -71,6 +66,61 @@ Data Structures:
         int grammarRuleNum;
         struct grammarOrderNodeStruct *next;
     }grammarOrderNode;
+    
+    // Type Expression Table DS
+
+    typedef enum {primitive, rect_array, jagged_array} Type;
+    typedef enum {stat, dyn, NA} Array_Type;
+
+    typedef struct dim {
+        int size;
+        struct dim* next;
+    } dimension;
+
+    typedef struct j_dim {
+        int size;
+        dimension* inner_size;
+        struct j_dim *next;
+    } jagged_dimension;
+
+    typedef struct jagg{
+        char *basicElementType;
+        int dimensions;
+        int low;
+        int high;
+        jagged_dimension *d;
+    } jagged;
+
+    typedef struct rect_dim {
+        char* low;
+        char* high;
+        struct rect_dim *next;
+    } rect_dimension;
+
+    typedef struct rectangular{
+        char *basicElementType;
+        int dimensions;
+        rect_dimension *d;
+    } rect;
+
+    typedef struct primitive{
+        char *basicElementType;
+    } prim;
+
+    typedef union expr{
+            prim *a;
+            rect *b;
+            jagged *c;
+    } expression;
+
+    typedef struct typeExpTable {
+        char *name;
+        Type type;
+        Array_Type array_type;
+        expression* exp;
+        struct typeExpTable* next;
+    } typeExpressionTable;
+
 #endif
 
 
@@ -83,15 +133,15 @@ int readGrammar (char* grammarFilePath,  grammarNode** G);
 tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
 
 // Function Prototype: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
-int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G);
+parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G);
 
 // Function Prototype: traverseParseTree (parseTree *t, typeExpressionTable T)
-int traverseParseTree (parseTree *t, typeExpressionTable T);
+int traverseParseTree (parseTree *t, typeExpressionTable *T);
 
 // Function Prototype: printParseTree (parseTree *t)
 int printParseTree (parseTree *t);
 
 // Function Prototype: printTypeExpressionTable (typeExpressionTable T)
-int printTypeExpressionTable (typeExpressionTable T);
+int printTypeExpressionTable (typeExpressionTable *T);
 
 void print_grammar_rule(grammarNode* root);

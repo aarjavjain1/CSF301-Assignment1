@@ -32,7 +32,7 @@ id -> VAR
 id -> NUMBER
 index_def_list_2 -> index_def_2 index_def_list_2
 index_def_list_2 -> index_def_2
-index_def_2 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_2 RCURLY
+index_def_2 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_3 RCURLY
 value_list_2 -> NUMBER SEMICOLON value_list_2
 value_list_2 -> NUMBER
 index_def_list_3 -> index_def_3 index_def_list_3

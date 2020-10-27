@@ -13,7 +13,7 @@ int main(int argc, char* argv[]){
     grammarNode* Grammar[NUMBER_OF_GRAMMAR_RULES];
     tokenStream* TokenStreamPointer = NULL;
     parseTree* ParseTree = NULL;
-    typeExpressionTable TypeExpressionTable;
+    typeExpressionTable* TypeExpressionTable = NULL;
     // Menu
     int menu_choice = 0;
     do {
@@ -44,9 +44,12 @@ int main(int argc, char* argv[]){
                 // for (int i = 0; i<NUMBER_OF_GRAMMAR_RULES; i++){
                 //     printf("%d", i);print_grammar_rule(Grammar[i]);
                 // }
-                createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
 
                 printf ("Parse tree creation works\n\n");
+                traverseParseTree(ParseTree, TypeExpressionTable);
+
+                printf ("Parse tree traversal: In Progress\n\n");
                 break;
             }
             case 2:{
