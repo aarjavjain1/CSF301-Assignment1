@@ -11,6 +11,16 @@ This file implements all the necessary functions for the compiler to work.
 #define MAX_LEN 1000
 // Function Definition: readGrammar( “grammar.txt”, grammar G)
 
+void freeStackMemory(stack* st){
+    // printf("inside freeStackMemory\n");
+    if (st == NULL)
+        return;
+    stack* next = st->next;
+    // printf("freeing st node: %s\n", st->str);
+    free(st);
+    freeStackMemory(next);
+}
+
 bool isVariable(char* str){
     for (int yu=0; yu <(int)strlen(str); ++yu){
         if (yu == 0){
@@ -71,7 +81,7 @@ tokenStream* get_token(char* token,int* line_count)
     new->tokenName = (char *) malloc (sizeof(char) * 100);
     if (search(token) == 1){
       // printf("NICHT\n");
-      char *temp_ = (char *) malloc(strlen(token) + 1);
+      char *temp_ = (char *) malloc(sizeof(char)*(strlen(token)+1));
       for (int yu=0; yu < (int) strlen(token); ++yu)
           temp_[yu] = toupper(token[yu]);
     temp_[(int)strlen(token)] = '\0';
@@ -98,8 +108,8 @@ tokenStream* get_token(char* token,int* line_count)
         {
             case '+':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("OP_PLUS"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("+"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("OP_PLUS")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("+")+1));
                 strcpy(new->tokenName, "OP_PLUS");
                 strcpy(new->lexeme, "+");
                 new->lineNumber = *line_count;
@@ -109,8 +119,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '-':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("OP_MINUS"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("-"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("OP_MINUS") + 1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("-")+1));
                 strcpy(new->tokenName, "OP_MINUS");
                 strcpy(new->lexeme, "-");
                 new->lineNumber = *line_count;
@@ -120,8 +130,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '/':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("OP_DIV"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("/"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("OP_DIV")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("/")+1));
                 strcpy(new->tokenName, "OP_DIV");
                 strcpy(new->lexeme, "/");
                 new->lineNumber = *line_count;
@@ -131,8 +141,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '[':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("LSQUARE"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("["));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("LSQUARE")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("[")+1));
                 strcpy(new->tokenName, "LSQUARE");
                 strcpy(new->lexeme, "[");
                 new->lineNumber = *line_count;
@@ -142,8 +152,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case ']':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("RQSQUARE"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("]"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("RQSQUARE")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("]")+1));
                 strcpy(new->tokenName, "RSQUARE");
                 strcpy(new->lexeme, "]");
                 new->lineNumber = *line_count;
@@ -153,7 +163,7 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '{':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("LCURLY"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("LCURLY")+1));
                 new->lexeme = (char *) malloc (sizeof(char) * strlen("{"));
                 strcpy(new->tokenName, "LCURLY");
                 strcpy(new->lexeme, "{");
@@ -164,8 +174,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '}':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("RCURLY"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("}"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("RCURLY")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("}")+1));
                 strcpy(new->tokenName, "RCURLY");
                 strcpy(new->lexeme, "}");
                 new->lineNumber = *line_count;
@@ -175,8 +185,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '(':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("LSIMPLE"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("("));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("LSIMPLE")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("(")+1));
                 strcpy(new->tokenName, "LSIMPLE");
                 strcpy(new->lexeme, "(");
                 new->lineNumber = *line_count;
@@ -186,8 +196,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case ')':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("RSIMPLE"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen(")"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("RSIMPLE")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen(")")+1));
                 strcpy(new->tokenName, "RSIMPLE");
                 strcpy(new->lexeme, ")");
                 new->lineNumber = *line_count;
@@ -197,8 +207,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case ';':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("SEMICOLON"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen(";"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("SEMICOLON")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen(";")+1));
                 strcpy(new->tokenName, "SEMICOLON");
                 strcpy(new->lexeme, ";");
                 new->lineNumber = *line_count;
@@ -208,8 +218,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case ',':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("COMMA"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen(","));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("COMMA")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen(",")+1));
                 strcpy(new->tokenName, "COMMA");
                 strcpy(new->lexeme, ",");
                 new->lineNumber = *line_count;
@@ -219,8 +229,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case '=':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("EQUALS"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("="));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("EQUALS")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("=")+1));
                 strcpy(new->tokenName, "EQUALS");
                 strcpy(new->lexeme, "=");
                 new->lineNumber = *line_count;
@@ -230,8 +240,8 @@ tokenStream* get_token(char* token,int* line_count)
             }
             case ':':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("COLON"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen(":"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("COLON")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen(":")+1));
                 strcpy(new->tokenName, "COLON");
                 strcpy(new->lexeme, ":");
                 new->lineNumber = *line_count;
@@ -242,8 +252,8 @@ tokenStream* get_token(char* token,int* line_count)
 
             case '*':
             {
-                new->tokenName = (char *) malloc (sizeof(char) * strlen("OP_MULT"));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("*"));
+                new->tokenName = (char *) malloc (sizeof(char) * (strlen("OP_MULT")+1));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("*")+1));
                 strcpy(new->tokenName, "OP_MULT");
                 strcpy(new->lexeme, "*");
                 new->lineNumber = *line_count;
@@ -260,7 +270,7 @@ tokenStream* get_token(char* token,int* line_count)
                 new->tokenName = "DOLLAR";
         }
     }
-    new->lexeme = (char *) malloc (sizeof(char) * (strlen(token) + 1));
+    new->lexeme = (char *) malloc (sizeof(char) * (strlen(token)+1));
 
     strcpy(new->lexeme, token);
     new->lineNumber = *line_count;
@@ -300,7 +310,7 @@ int isGrammarWordTerminal(char* str){
 stack* newNode(char* str)
 {
     stack* stackNode = (stack*)malloc(sizeof(stack));
-    stackNode->str = (char*)(malloc(sizeof(char)*(strlen(str)+1)));
+    stackNode->str = (char*) malloc(sizeof(char) * (strlen(str) + 1));
     strcpy(stackNode->str, str);
     stackNode->terminal = isGrammarWordTerminal(str);
     stackNode->next = NULL;
@@ -366,7 +376,7 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
         // printf("lol\n");
         grammarNode * temp = (grammarNode*)malloc(sizeof(grammarNode));
         grammarNode * head = temp;
-        temp->grammarWord = (char *)malloc(sizeof(char)*strlen(token));
+        temp->grammarWord = (char *)malloc(sizeof(char)*(strlen(token) + 1));
         strcpy(temp->grammarWord,token);
         token = strtok(NULL, " ");
        /* walk through other tokens */
@@ -378,7 +388,7 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
             // printf( "%s\n", token );
             temp->next = (grammarNode*)malloc(sizeof(grammarNode));
             temp = temp->next;
-            temp->grammarWord = (char *)malloc(sizeof(char)*strlen(token));
+            temp->grammarWord = (char *)malloc(sizeof(char)*(strlen(token)+1));
             strcpy(temp->grammarWord,token);
             // printf("HERE");
             token = strtok(NULL, " ");
@@ -448,8 +458,9 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
 }
 
 int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
-    stack* st;
+    stack* st = NULL;
     st = stack_push(st, "DOLLAR");
+    st->next = NULL;
     // printf ("after dollar push, st->str: %s\n", st->str);
     st = stack_pushrhs(st, G[grammarRuleNum]->next);
 
@@ -486,16 +497,22 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
             }
             if (!ruleSelectedFlag){
                 // printf("no rule found\n");
+                freeStackMemory(st);
                 return 0;
             }
         }
         else{
             // printf("returning 0 on st: %s, token: %s\n", st->str, temp->tokenName);
+            freeStackMemory(st);
+            // free(st);
             return 0;
         }
     }
     // printf("returning 1 as prediction on G[i]:");
     // print_grammar_rule(G[grammarRuleNum]);
+    // printf("before I free anything\n");
+    freeStackMemory(st);
+    // free(st);
     return 1;
 }
 
@@ -532,7 +549,7 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         current->children[childToPopulate]->isTerminal = terminal;
         current->children[childToPopulate]->grammarRuleUsed = NULL;
         current->children[childToPopulate]->isLeaf = 0;
-        printf("populated %s", Gi->grammarWord);
+        // printf("populated %s", Gi->grammarWord);
         childToPopulate++;
         // other fields for this node in the parse tree will be filled in createParseTree if terminal on stack is detected
     }
@@ -582,7 +599,7 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
             // printf("stack: ");(st);
         }
         if ((stack_top(st)->terminal == 1) && !strcmp(stack_top(st)->str, currentToken->tokenName)){
-            printf("accepted terminal: %s\n", currentToken->tokenName);
+            // printf("accepted terminal: %s\n", currentToken->tokenName);
             st = stack_pop(st);
             current->lexeme = currentToken->lexeme;
             current->lineNumber = currentToken->lineNumber;
@@ -592,8 +609,8 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
             for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
                 current->children[i] = NULL;
             current = parseTreeGetCurrent(t);
-            if (current == NULL)
-                printf("terminal ke baad diqqat\n");
+            // if (current == NULL)
+            //     printf("terminal ke baad diqqat\n");
             currentToken = currentToken->next;
         }
         else if (stack_top(st)->terminal == 0){
@@ -608,13 +625,13 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
                     // }
                     if (predictRule(i, G, currentToken)){
                         // print_grammar_rule(G[i]);
-                        printf("got a rule yayayayayayay\n");
+                        // printf("got a rule yayayayayayay\n");
                         ruleSelectedFlag = 1;
                         st = stack_pop(st);
                         st = stack_pushrhs(st, G[i]->next);
                         current->grammarRuleUsed = G[i];
                         current->symbolName = G[i]->grammarWord;
-                        printf("stack after rule insertion: ");print_stack(st);
+                        // printf("stack after rule insertion: ");print_stack(st);
                         populateChildrenGrammarNode(current, G[i]);
                         if (current->children[0] == NULL)
                             printf("KHALi!!!\n");
