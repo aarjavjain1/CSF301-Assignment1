@@ -17,6 +17,7 @@ void freeStackMemory(stack* st){
         return;
     stack* next = st->next;
     // printf("freeing st node: %s\n", st->str);
+    free(st->str);
     free(st);
     freeStackMemory(next);
 }
@@ -300,17 +301,16 @@ int isEmpty(stack* root)
 
 stack* stack_top(stack* root)
 {
-    if (isEmpty(root))
-        return NULL;
     return root;
 }
 
 stack* stack_pop(stack* root)
 {
-    if (isEmpty(root))
+    if (root == NULL)
       return NULL;
     stack* temp = root;
     root = root->next;
+    free(temp->str);
     free(temp);
     return root;
 }
@@ -322,18 +322,16 @@ int isGrammarWordTerminal(char* str){
     return 0;
 }
 
-stack* newNode(char* str)
-{
+// stack* newNode(char* str)
+// {
+//     return NULL;
+// }
+
+stack* stack_push(stack* root, char* str){
     stack* stackNode = (stack*)malloc(sizeof(stack));
     stackNode->str = (char*) malloc(sizeof(char) * (strlen(str) + 1));
     strcpy(stackNode->str, str);
     stackNode->terminal = isGrammarWordTerminal(str);
-    stackNode->next = NULL;
-    return stackNode;
-}
-
-stack* stack_push(stack* root, char* str){
-    stack* stackNode = newNode(str);
     stackNode->next = root;
     // root = stackNode;
     // printf ("end of push to stack: %s\n", str);
@@ -712,6 +710,7 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
             printf("st ka top: %s, token: %s", st->str, currentToken->tokenName);
         }
     }
+    freeStackMemory(st);
     printParseTree(t);
     printf ("Parse tree created.\n");
 
