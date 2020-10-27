@@ -66,6 +66,11 @@ Data Structures:
         int terminal;
         struct StackNode* next;
     } stack;
+
+    typedef struct grammarOrderNodeStruct {
+        int grammarRuleNum;
+        struct grammarOrderNodeStruct *next;
+    }grammarOrderNode;
 #endif
 
 

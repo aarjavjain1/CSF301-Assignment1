@@ -78,7 +78,7 @@ char *trimwhitespace(char *str)
 tokenStream* get_token(char* token,int* line_count)
 {
     tokenStream *new = (tokenStream *) malloc(sizeof(tokenStream));
-    new->tokenName = (char *) malloc (sizeof(char) * 100);
+    // new->tokenName = (char *) malloc (sizeof(char) * 100);
     if (search(token) == 1){
       // printf("NICHT\n");
       char *temp_ = (char *) malloc(sizeof(char)*(strlen(token)+1));
@@ -86,22 +86,37 @@ tokenStream* get_token(char* token,int* line_count)
           temp_[yu] = toupper(token[yu]);
     temp_[(int)strlen(token)] = '\0';
       //printf("token: %s\n", buff);
+      new->tokenName = (char*) malloc(sizeof(char) * (strlen(temp_)+1));
       strcpy(new->tokenName, temp_);
     }
-    else if (!strcmp(token, "R1"))
+    else if (!strcmp(token, "R1")){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("R1")+1));
         strcpy(new->tokenName, "R1");
-    else if (!strcmp(token, "size"))
+    }
+    else if (!strcmp(token, "size")){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("GSIZE")+1));
         strcpy(new->tokenName, "GSIZE");
-    else if (isVariable(token))
+    }
+    else if (isVariable(token)){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("VAR")+1));
         strcpy(new->tokenName,"VAR");
-    else if(isNumber(token))
+    }
+    else if(isNumber(token)){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("NUMBER")+1));
         strcpy(new->tokenName,"NUMBER");
-    else if(!strcmp(token,"&&&"))
+    }
+    else if(!strcmp(token,"&&&")){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("OP_AND")+1));
         strcpy(new->tokenName,"OP_AND");
-    else if(!strcmp(token,"|||"))
+    }
+    else if(!strcmp(token,"|||")){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("OP_OR")+1));
         strcpy(new->tokenName,"OP_OR");
-    else if(!strcmp(token,".."))
+    }
+    else if(!strcmp(token,"..")){
+        new->tokenName = (char*) malloc(sizeof(char) * (strlen("DOT")+1));
         strcpy(new->tokenName,"DOT");
+    }
     else if(strlen(token)==1)
     {
         switch (token[0])
@@ -164,7 +179,7 @@ tokenStream* get_token(char* token,int* line_count)
             case '{':
             {
                 new->tokenName = (char *) malloc (sizeof(char) * (strlen("LCURLY")+1));
-                new->lexeme = (char *) malloc (sizeof(char) * strlen("{"));
+                new->lexeme = (char *) malloc (sizeof(char) * (strlen("{")+1));
                 strcpy(new->tokenName, "LCURLY");
                 strcpy(new->lexeme, "{");
                 new->lineNumber = *line_count;
@@ -388,6 +403,7 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
             // printf( "%s\n", token );
             temp->next = (grammarNode*)malloc(sizeof(grammarNode));
             temp = temp->next;
+            temp->next = NULL;
             temp->grammarWord = (char *)malloc(sizeof(char)*(strlen(token)+1));
             strcpy(temp->grammarWord,token);
             // printf("HERE");
@@ -408,6 +424,37 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
     //     printf("\n");
     // }
     return 0;
+}
+
+grammarOrderNode* grammarOrderAdd(int ruleNum, grammarOrderNode *grammarOrder){
+    if (grammarOrder == NULL){
+        grammarOrder = (grammarOrderNode*) malloc(sizeof(grammarOrderNode));
+        grammarOrder->grammarRuleNum = ruleNum;
+        grammarOrder->next = NULL;
+        return grammarOrder;
+    }
+    grammarOrderNode *temp = grammarOrder;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = (grammarOrderNode*) malloc(sizeof(grammarOrderNode));
+    temp->grammarRuleNum = ruleNum;
+    temp->next->next = NULL;
+    return grammarOrder;
+}
+
+grammarOrderNode* grammarOrderRemoveLast(grammarOrderNode *grammarOrder){
+    grammarOrderNode *temp = grammarOrder;
+    if (temp == NULL)
+        return temp;
+    if (temp->next == NULL){
+        free(temp);
+        return NULL;
+    }
+    while (temp->next->next != NULL)
+        temp = temp->next;
+    free(temp->next);
+    temp->next = NULL;
+    return grammarOrder;
 }
 
 // Function Definition: tokeniseSourcecode(  “sourcecode.txt”,  tokenStream  *s)
@@ -457,7 +504,7 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     return head;
 }
 
-int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
+int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken, grammarOrderNode **grammarOrderAddress){
     stack* st = NULL;
     st = stack_push(st, "DOLLAR");
     st->next = NULL;
@@ -485,7 +532,10 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream* currentToken){
                         // printf ("sending grammar rule (predict): ");
                         // print_grammar_rule(G[i]);
                     }
-                    if (predictRule(i, G, temp)){
+                    // *grammarOrderAddress = grammarOrderAdd(i, *grammarOrderAddress);
+                    int predict = predictRule(i, G, temp, grammarOrderAddress);
+                    // if (predict == 0) (*grammarOrderAddress) = grammarOrderRemoveLast(*grammarOrderAddress);
+                    if (predict == 1){
                         // printf("predicted rule: \n");
                         // printf("%s -> %s\n", G[i]->grammarWord, G[i]->next->grammarWord);
                         ruleSelectedFlag = 1;
@@ -539,7 +589,6 @@ parseTree* parseTreeGetCurrent(parseTree* t){
     return NULL;
 }
 
-
 void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
     int childToPopulate = 0;
     while (Gi->next!=NULL){
@@ -549,6 +598,8 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         current->children[childToPopulate]->isTerminal = terminal;
         current->children[childToPopulate]->grammarRuleUsed = NULL;
         current->children[childToPopulate]->isLeaf = 0;
+        for (int i = 0; i<MAX_PARSE_TREE_CHILDREN; i++)
+            current->children[childToPopulate]->children[i] = NULL;
         // printf("populated %s", Gi->grammarWord);
         childToPopulate++;
         // other fields for this node in the parse tree will be filled in createParseTree if terminal on stack is detected
@@ -557,25 +608,13 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
 
 // Function Definition: createParseTree (parseTree  *t,  tokenStream  *s,  grammar  G)
 int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
-    // initiate stack
-    // fill start in stack
-    // while loop
-    //  check if terminal
-    //      pop from stack and add to parse tree
-    // check if non terminal
-    //      pop from stack and add to parse tree and push rhs of grammar rule to stack
-    //
     // pseudocode if we have parsing table (M[X][a]): https://www.tutorialspoint.com/compiler_design/compiler_design_top_down_parser.htm
+
+    grammarOrderNode *grammarOrder = NULL;
 
     stack* st = NULL;
     st = stack_push(st, "DOLLAR");
     st = stack_push(st, "main_program");
-    // printf ("Dollar and start pushed to stack\n");
-    // tokenStream* test =s;
-    // while(test != NULL){
-    //   printf("%s\n",test->tokenName );
-    //   test = test->next;
-    // }
     t = malloc(sizeof(parseTree));
     parseTree* current = t;
     for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
@@ -616,35 +655,57 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
         else if (stack_top(st)->terminal == 0){
             // loop over grammar, for possible rules, check possility using backtracking function.
             int ruleSelectedFlag = 0;
-            for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
-                // printf("grammar rule for if : %s\n", G[i]->grammarWord);
-                if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
-                    // {
-                    //     printf ("seding grammar rule: ");
-                    //     print_grammar_rule(G[i]);
-                    // }
-                    if (predictRule(i, G, currentToken)){
-                        // print_grammar_rule(G[i]);
-                        // printf("got a rule yayayayayayay\n");
-                        ruleSelectedFlag = 1;
-                        st = stack_pop(st);
-                        st = stack_pushrhs(st, G[i]->next);
-                        current->grammarRuleUsed = G[i];
-                        current->symbolName = G[i]->grammarWord;
-                        // printf("stack after rule insertion: ");print_stack(st);
-                        populateChildrenGrammarNode(current, G[i]);
-                        if (current->children[0] == NULL)
-                            printf("KHALi!!!\n");
-                        current = parseTreeGetCurrent(t);
-                        if (current == NULL)
-                            printf("sachmein KHALi!!!\n");
+            // if (grammarOrder == NULL){
+                for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+                    // printf("grammar rule for if : %s\n", G[i]->grammarWord);
+                    if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
+                        // {
+                        //     printf ("seding grammar rule: ");
+                        //     print_grammar_rule(G[i]);
+                        // }
+                        // grammarOrder = grammarOrderAdd(i, grammarOrder);
+                        int predict = predictRule(i, G, currentToken, &grammarOrder);
+                        // if (predict == 0)grammarOrder = grammarOrderRemoveLast(grammarOrder);
+                        if (predict == 1){
+                            // print_grammar_rule(G[i]);
+                            // printf("got a rule yayayayayayay\n");
+                            ruleSelectedFlag = 1;
+                            st = stack_pop(st);
+                            st = stack_pushrhs(st, G[i]->next);
+                            current->grammarRuleUsed = G[i];
+                            current->symbolName = G[i]->grammarWord;
+                            // printf("stack after rule insertion: ");print_stack(st);
+                            populateChildrenGrammarNode(current, G[i]);
+                            if (current->children[0] == NULL)
+                                printf("KHALi!!!\n");
+                            current = parseTreeGetCurrent(t);
+                            if (current == NULL)
+                                printf("sachmein KHALi!!!\n");
+                        }
                     }
                 }
-            }
-            if (!ruleSelectedFlag){
-                printf ("No rule Selected, Some error present\n");
-                break;
-            }
+                if (!ruleSelectedFlag){
+                    printf ("No rule Selected, Some error present\n");
+                    break;
+                }
+            // }
+            // else {
+            //     grammarOrderNode* temp = grammarOrder;
+            //     grammarOrder = grammarOrder->next;
+            //     int i = temp->grammarRuleNum;
+            //     free(temp);
+            //     st = stack_pop(st);
+            //     st = stack_pushrhs(st, G[i]->next);
+            //     current->grammarRuleUsed = G[i];
+            //     current->symbolName = G[i]->grammarWord;
+            //     // printf("stack after rule insertion: ");print_stack(st);
+            //     populateChildrenGrammarNode(current, G[i]);
+            //     if (current->children[0] == NULL)
+            //         printf("KHALi!!!\n");
+            //     current = parseTreeGetCurrent(t);
+            //     if (current == NULL)
+            //         printf("sachmein KHALi!!!\n");
+            // }
         }
         else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");
