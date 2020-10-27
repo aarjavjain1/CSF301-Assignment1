@@ -698,14 +698,15 @@ int createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
                     }
                 }
                 if (!ruleSelectedFlag){
+                    printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
                     printf ("No rule Selected, Some error present\n");
-                    break;
+                    return 1;
                 }
         }
         else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");
             printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
-            break;
+            return 1;
         }
     }
     freeStackMemory(st);
