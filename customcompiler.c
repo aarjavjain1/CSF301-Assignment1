@@ -11,6 +11,31 @@ This file implements all the necessary functions for the compiler to work.
 #define MAX_LEN 1000
 // Function Definition: readGrammar( “grammar.txt”, grammar G)
 
+void freeTokenStreamMemory(tokenStream* t){
+    if (t == NULL)
+        return;
+    tokenStream* next = t->next;
+    free(t->lexeme);
+    free(t->tokenName);
+    free(t);
+    freeTokenStreamMemory(next);
+}
+
+void freeGrammarRuleMemory(grammarNode* Gi){
+    if (Gi == NULL)
+        return;
+    grammarNode* next = Gi->next;
+    free(Gi->grammarWord);
+    free(Gi);
+    freeGrammarRuleMemory(next);
+}
+
+void freeGrammarMemory(grammarNode** G){
+    for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+        freeGrammarRuleMemory(G[i]);
+    }
+}
+
 void freeStackMemory(stack* st){
     // printf("inside freeStackMemory\n");
     if (st == NULL)
