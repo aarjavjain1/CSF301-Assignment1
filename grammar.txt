@@ -12,7 +12,7 @@ declaration_right_ext -> ARRAY range_list OF INTEGER SEMICOLON
 declaration_right_ext -> JAGGED ARRAY j_range_list
 range_list -> LSQUARE id DOT id RSQUARE range_list
 range_list -> LSQUARE id DOT id RSQUARE
-j_range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_2
+j_range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_3
 j_range_list -> range_list_3 OF INTEGER SEMICOLON index_def_list_3
 var_list -> VAR var_list
 var_list -> VAR VAR
@@ -30,11 +30,6 @@ range_list_2 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE
 range_list_3 -> LSQUARE id DOT id RSQUARE LSQUARE RSQUARE LSQUARE RSQUARE
 id -> VAR
 id -> NUMBER
-index_def_list_2 -> index_def_2 index_def_list_2
-index_def_list_2 -> index_def_2
-index_def_2 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_3 RCURLY
-value_list_2 -> NUMBER SEMICOLON value_list_2
-value_list_2 -> NUMBER
 index_def_list_3 -> index_def_3 index_def_list_3
 index_def_list_3 -> index_def_3
 index_def_3 -> R1 LSQUARE NUMBER RSQUARE COLON GSIZE NUMBER COLON VALUES LCURLY value_list_3 RCURLY
@@ -42,7 +37,7 @@ value_list_3 -> mini_value_list_3 SEMICOLON value_list_3
 value_list_3 -> mini_value_list_3
 mini_value_list_3 -> NUMBER mini_value_list_3
 mini_value_list_3 -> NUMBER
-assignment -> VAR EQUALS expression SEMICOLON
+assignment -> lhs EQUALS expression SEMICOLON
 expression -> and_expression OP_OR expression
 expression -> and_expression
 and_expression -> arith_expression OP_AND and_expression
@@ -51,12 +46,10 @@ arith_expression -> term op_plus_minus arith_expression
 arith_expression -> term
 term -> factor op_mult_div term
 term -> factor
-factor -> VAR LSQUARE inside RSQUARE
+factor -> VAR LSQUARE mini_value_list_3 RSQUARE
 factor -> id
-inside -> d_inside
-inside -> t_inside
-d_inside -> id id
-t_inside -> id id id
+lhs -> VAR LSQUARE mini_value_list_3 RSQUARE
+lhs -> VAR
 op_plus_minus -> OP_PLUS
 op_plus_minus -> OP_MINUS
 op_mult_div -> OP_MULT

@@ -810,7 +810,7 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
             temp->exp->b->basicElementType = (char*)malloc(sizeof("INTEGER")+1);
             temp->exp->b->d = NULL;
             strcpy(temp->exp->b->basicElementType, "INTEGER");
-            bool stat = true;
+            bool lstat = true;
             int dim = 0;
             for (int i = colon+1; i < parseIndex; i++){
                 if (!strcmp(parseArray[i]->symbolName, "LSQUARE")){
@@ -819,12 +819,12 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                     // if ((!strcmp(parseArray[i+1]->symbolName, "VAR") || !strcmp(parseArray[i+1]->symbolName, "NUMBER")) && (!strcmp(parseArray[i+3]->symbolName, "VAR") || !strcmp(parseArray[i+3]->symbolName, "NUMBER"))) {
                         // if (!strcmp(parseArray[i+1], "VAR") || !strcmp(parseArray[i+3], "VAR")) stat = false;
                     if (!strcmp(parseArray[i+1]->symbolName, "VAR"))
-                        stat = false;
+                        lstat = false;
                     rd->low = (char*)malloc(strlen(parseArray[i+1]->lexeme));
                     strcpy(rd->low, parseArray[i+1]->lexeme);
 
                     if (!strcmp(parseArray[i+3]->symbolName, "VAR"))
-                        stat = false;
+                        lstat = false;
                     rd->high = (char*)malloc(strlen(parseArray[i+3]->lexeme));
                     strcpy(rd->high, parseArray[i+3]->lexeme);
                     rd->next = NULL;
@@ -837,7 +837,7 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                     // }
                 }
             }
-            if (stat) temp->array_type = stat;
+            if (lstat) temp->array_type = stat;
             else temp->array_type = dyn;
             temp->exp->b->dimensions = dim;
             if (T == NULL) T = temp;
@@ -918,15 +918,16 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                             int inner_size = 0;
                             for (; strcmp(parseArray[colon]->symbolName, "SEMICOLON"); colon++){
                                 if (!strcmp(parseArray[colon]->symbolName, "RCURLY")) {
-                                    printf("Type Error Occurred\n");
+                                    printf("Type Error Occurred123\n");
                                     return;
                                 }
                                 if (!strcmp(parseArray[colon]->symbolName, "NUMBER")) inner_size++;
                                 else {
-                                    printf("Type Error Occurred\n");
+                                    printf("Type Error Occurred456\n");
                                     return;
                                 }
                             }
+                            colon++;
                             dimension* d = (dimension*)malloc(sizeof(dimension));
                             d->size = inner_size;
                             d->next = NULL;
@@ -941,7 +942,7 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                         for (; strcmp(parseArray[colon]->symbolName, "RCURLY"); colon++){
                             if (!strcmp(parseArray[colon]->symbolName, "NUMBER")) inner_size++;
                             else {
-                                printf("Type Error Occurred\n");
+                                printf("Type Error Occurred789\n");
                                 return;
                             }
                         }
