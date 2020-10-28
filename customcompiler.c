@@ -1099,3 +1099,36 @@ int printTypeExpressionTable (typeExpressionTable *T){
     }
     return 0;
 }
+
+typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table){
+    if(!strcmp(input->symbolName,"lhs")){
+        if(!strcmp(input->children[0]->symbolName,"VAR")){
+            if(input->children[1] == NULL){
+                typeExpressionTable* temp = table;
+                while(!strcmp(table->name,input->children[0]->lexeme)){
+                    temp = temp->next;
+                }
+                return temp;
+            }
+            else if(!strcmp(input->children[1],"LSQUARE")){
+              //do this
+            }
+            else{
+                printf("This should not have occured lhs !->var lsq || var \n");
+            }
+        }
+        else{
+            printf("This should not have occured lhs !-> var\n")
+        }
+    }
+    else if(!strcmp(input->symbolName,"factor")){
+        if(!strcmp(input->children[0],"VAR")){
+
+        }
+        else if(!strcmp(input->children[0],"id")){
+          
+        }
+    }
+
+
+}
