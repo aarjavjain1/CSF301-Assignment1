@@ -808,17 +808,17 @@ parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
 }
 
 // Function Definition: printParseTree (parseTree *t)
-int printParseTree (parseTree *t){
-    printf("Printing Tree ----  parseTreeNode: %s \n", t->symbolName);
-    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
-    //     if (t->children[i])
-    //         printf("%s\t", t->children[i]->symbolName);
-    // }
-    // printf("\n");
+int printParseTreeWithDepth (parseTree *t, int currentDepth){
+    printf("Printing Tree ---- depth: %s ---- parseTreeNode: %s \n", currentDepth, t->symbolName);
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i])
-            printParseTree(t->children[i]);
+            printParseTreeWithDepth(t->children[i], currentDepth + 1);
     }
+    return 0;
+}
+
+int printParseTree (parseTree *t){
+    printParseTreeWithDepth (t, 0);
     return 0;
 }
 
