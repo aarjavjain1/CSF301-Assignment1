@@ -78,6 +78,7 @@ Data Structures:
     } dimension;
 
     typedef struct j_dim {
+        int parent;
         int size;
         dimension* inner_size;
         struct j_dim *next;

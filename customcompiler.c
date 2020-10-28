@@ -700,29 +700,29 @@ parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
                 if (!ruleSelectedFlag){
                     printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
                     printf ("No rule Selected, Some error present\n");
-                    return 1;
+                    return NULL;
                 }
         }
         else{
             printf("Terminal at top of stack, but doesn't match, some problem exists\n");
             printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
-            return 1;
+            return NULL;
         }
     }
     freeStackMemory(st);
-    // printParseTree(t);
+    printParseTree(t);
     printf ("Parse tree created.\n");
     return t;
 }
 
 // Function Definition: printParseTree (parseTree *t)
 int printParseTree (parseTree *t){
-    printf("Printing Tree ----  parseTreeNode: %s -> ", t->symbolName);
-    for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
-        if (t->children[i])
-            printf("%s\t", t->children[i]->symbolName);
-    }
-    printf("\n");
+    printf("Printing Tree ----  parseTreeNode: %s \n", t->symbolName);
+    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
+    //     if (t->children[i])
+    //         printf("%s\t", t->children[i]->symbolName);
+    // }
+    // printf("\n");
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i])
             printParseTree(t->children[i]);
@@ -849,7 +849,8 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
         }
     }
     else if (!strcmp(parseArray[colon+1]->symbolName, "JAGGED")){
-        for (int i = low_var; i <= high_var; i++){
+        int colon_loc = colon;
+        for (int i = low_var; i <= high_var; i++, colon=colon_loc){
             typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
             temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
             strcpy(temp->name, parseArray[i]->lexeme);
@@ -858,33 +859,113 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
             temp->next = NULL;
             temp->exp = (expression*)malloc(sizeof(expression));
             temp->exp->c = (jagged*)malloc(sizeof(jagged));
-            temp->exp->b->basicElementType = (char*)malloc(sizeof("INTEGER")+1);
-            strcpy(temp->exp->b->basicElementType, "INTEGER");
-            temp->exp->b->d = NULL;
-            int dim = 0;
-            for (int i = colon+1; i < parseIndex; i++){
-                if (!strcmp(parseArray[i]->symbolName, "LSQUARE")){
-                    rect_dimension* rd = (rect_dimension*)malloc(sizeof(rect_dimension));
-                    dim++;
-                    // if ((!strcmp(parseArray[i+1]->symbolName, "VAR") || !strcmp(parseArray[i+1]->symbolName, "NUMBER")) && (!strcmp(parseArray[i+3]->symbolName, "VAR") || !strcmp(parseArray[i+3]->symbolName, "NUMBER"))) {
-                        // if (!strcmp(parseArray[i+1], "VAR") || !strcmp(parseArray[i+3], "VAR")) stat = false;
-                    rd->low = (char*)malloc(strlen(parseArray[i+1]->lexeme));
-                    strcpy(rd->low, parseArray[i+1]->lexeme);
+            temp->exp->c->basicElementType = (char*)malloc(sizeof("INTEGER")+1);
+            strcpy(temp->exp->c->basicElementType, "INTEGER");
+            temp->exp->c->d = NULL;
+            int low, high, dim;
+            // printf("Yaha pahunch gayi mai1\n");
+            if (!strcmp(parseArray[colon+2]->symbolName, "ARRAY") &&
+                !strcmp(parseArray[colon+3]->symbolName, "LSQUARE") &&
+                !strcmp(parseArray[colon+4]->symbolName, "NUMBER") &&
+                !strcmp(parseArray[colon+5]->symbolName, "DOT") &&
+                !strcmp(parseArray[colon+6]->symbolName, "NUMBER") &&
+                !strcmp(parseArray[colon+7]->symbolName, "RSQUARE") &&
+                !strcmp(parseArray[colon+8]->symbolName, "LSQUARE") &&
+                !strcmp(parseArray[colon+9]->symbolName, "RSQUARE")) {
+                    if (!strcmp(parseArray[colon+10]->symbolName, "LSQUARE") && !strcmp(parseArray[colon+11]->symbolName, "RSQUARE")) temp->exp->c->dimensions = 3;
+                    else temp->exp->c->dimensions = 2;
+            // printf("Yaha pahunch gayi mai2\n");
+                    temp->exp->c->low = atoi(parseArray[colon+4]->lexeme);
+                    temp->exp->c->high = atoi(parseArray[colon+6]->lexeme);
+                    low = atoi(parseArray[colon+4]->lexeme);
+                    high = atoi(parseArray[colon+6]->lexeme);
+                    dim = temp->exp->c->dimensions;
+            } else { // should not occur (not accepted by grammar)
+                printf("Type Error Occurred\n");
+                return;
+            }
 
-                    rd->high = (char*)malloc(strlen(parseArray[i+3]->lexeme));
-                    strcpy(rd->high, parseArray[i+3]->lexeme);
-                    rd->next = NULL;
-                    if (temp->exp->b->d == NULL) temp->exp->b->d = rd;
-                    else {
-                        rect_dimension* l = temp->exp->b->d;
-                        while(l->next) l = l->next;
-                        l->next = rd;
+            for (; colon < parseIndex; colon++) {
+                if (strcmp(parseArray[colon]->symbolName, "R1")) { // if not R1
+                    continue;
+                } else {
+                    jagged_dimension* jd = (jagged_dimension*)malloc(sizeof(jagged_dimension));
+                    jd->parent = atoi(parseArray[colon+2]->lexeme);
+                    if (jd->parent < low || jd->parent > high) {
+                        printf("Jagged Array Index out of Bounds\n");
+                        return;
                     }
-                    // }
+                    jd->size = atoi(parseArray[colon+6]->lexeme);
+                    jd->next = NULL;
+                    int loop = jd->size;
+                    colon += 10;
+                    if (dim == 2){
+                        while(--loop){
+                            if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "SEMICOLON")) {
+                                printf("Type Error Occurred\n");
+                                return;
+                            }
+                            colon += 2;
+                        }
+                        if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "RCURLY")) {
+                            printf("Type Error Occurred\n");
+                            return;
+                        }
+                        jd->inner_size = NULL;
+                    }
+                    else if (dim == 3){
+                        while(--loop){
+                            int inner_size = 0;
+                            for (; strcmp(parseArray[colon]->symbolName, "SEMICOLON"); colon++){
+                                if (!strcmp(parseArray[colon]->symbolName, "RCURLY")) {
+                                    printf("Type Error Occurred\n");
+                                    return;
+                                }
+                                if (!strcmp(parseArray[colon]->symbolName, "NUMBER")) inner_size++;
+                                else {
+                                    printf("Type Error Occurred\n");
+                                    return;
+                                }
+                            }
+                            dimension* d = (dimension*)malloc(sizeof(dimension));
+                            d->size = inner_size;
+                            d->next = NULL;
+                            if (jd->inner_size == NULL) jd->inner_size = d;
+                            else {
+                                dimension* l = jd->inner_size;
+                                while(l->next) l = l->next;
+                                l->next = d;
+                            }
+                        }
+                        int inner_size = 0;
+                        for (; strcmp(parseArray[colon]->symbolName, "RCURLY"); colon++){
+                            if (!strcmp(parseArray[colon]->symbolName, "NUMBER")) inner_size++;
+                            else {
+                                printf("Type Error Occurred\n");
+                                return;
+                            }
+                        }
+                        dimension* d = (dimension*)malloc(sizeof(dimension));
+                        d->size = inner_size;
+                        d->next = NULL;
+                        if (jd->inner_size == NULL) jd->inner_size = d;
+                        else {
+                            dimension* l = jd->inner_size;
+                            while(l->next) l = l->next;
+                            l->next = d;
+                        }
+                    }
+                    else {
+                        printf("Jagged Array Dimension out of range\n");
+                    }
+                    if (temp->exp->c->d == NULL) temp->exp->c->d = jd;
+                    else {
+                        jagged_dimension* l = temp->exp->c->d;
+                        while(l->next) l = l->next;
+                        l->next = jd;
+                    }
                 }
             }
-            if (stat) temp->array_type = stat;
-            else temp->array_type = dyn;
             temp->exp->b->dimensions = dim;
             if (T == NULL) T = temp;
             else {
@@ -893,6 +974,9 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                 l->next = temp;
             }
         }
+    }
+    else {
+        printf("Traversal Error Occured\n");
     }
     printTypeExpressionTable(T);
 
