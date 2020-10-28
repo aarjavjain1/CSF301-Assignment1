@@ -36,10 +36,10 @@ int main(int argc, char* argv[]){
                 readGrammar(GRAMMAR_FILE_PATH, Grammar);
                 TokenStreamPointer = tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
                 tokenStream* test =TokenStreamPointer;
-                while(test != NULL){
-                printf("%s\n",test->tokenName );
-                test = test->next;
-                }
+                // while(test != NULL){
+                // printf("%s\n",test->tokenName );
+                // test = test->next;
+                // }
                 printf ("tokenised\n");
                 // for (int i = 0; i<NUMBER_OF_GRAMMAR_RULES; i++){
                 //     printf("%d", i);print_grammar_rule(Grammar[i]);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]){
 
                 printf ("Parse tree creation works\n\n");
                 traverseParseTree(&ParseTree, &TypeExpressionTable);
-                printTypeExpressionTable(TypeExpressionTable);
+                // printTypeExpressionTable(TypeExpressionTable);
 
                 // printf ("Parse tree traversal: In Progress\n\n");
                 break;
