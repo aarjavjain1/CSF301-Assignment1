@@ -589,7 +589,7 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
 
     char *buffer = (char* ) malloc(sizeof(char) * MAX_LEN);
     // -1 to allow room for NULL terminator for really long string
-    int line_num = 0;
+    int line_num = 1;
     tokenStream* temp = NULL;
     tokenStream* head = NULL;
     tokenStream* prev = NULL;
@@ -802,7 +802,7 @@ parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
         }
     }
     freeStackMemory(st);
-    printParseTree(t);
+    // printParseTree(t);
     printf ("Parse tree created.\n");
     return t;
 }
@@ -1132,9 +1132,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                             return NULL;
 
                         typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                        temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                        strcpy(temp_->name,"non_terminal");
                         temp_->type = primitive;
+                        temp_->next = NULL;
                         temp_->exp = (expression *)malloc(sizeof(expression));
                         temp_->exp->a = (prim *)malloc(sizeof(prim));
                         temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
@@ -1167,8 +1168,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                             return NULL;
 
                         typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                        temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                        strcpy(temp_->name,"non_terminal");
+                        temp_->next = NULL;
                         temp_->type = primitive;
                         temp_->exp = (expression *)malloc(sizeof(expression));
                         temp_->exp->a = (prim *)malloc(sizeof(prim));
@@ -1249,8 +1251,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                           return NULL;
 
                       typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                      temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                      strcpy(temp_->name,"non_terminal");
+                        temp_->next = NULL;
                       temp_->type = primitive;
                       temp_->exp = (expression *)malloc(sizeof(expression));
                       temp_->exp->a = (prim *)malloc(sizeof(prim));
@@ -1284,8 +1287,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                           return NULL;
 
                       typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                      temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                      strcpy(temp_->name,"non_terminal");
+                        temp_->next = NULL;
                       temp_->type = primitive;
                       temp_->exp = (expression *)malloc(sizeof(expression));
                       temp_->exp->a = (prim *)malloc(sizeof(prim));
@@ -1321,8 +1325,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
             }
             else if (!strcmp(input->children[0]->children[0]->symbolName,"NUMBER")){
                 typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                temp->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                strcpy(temp->name,input->children[0]->children[0]->symbolName);
+                temp->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                strcpy(temp->name,"non_terminal");
+                temp->next = NULL;
                 temp->type = primitive;
                 temp->exp = (expression *)malloc(sizeof(expression));
                 temp->exp->a = (prim *)malloc(sizeof(prim));
@@ -1343,6 +1348,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
 }
 
 int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
+
     if (op == 1 && a->type == primitive && !strcmp(a->exp->a->basicElementType,"BOOLEAN") &&
         b->type == primitive && !strcmp(b->exp->a->basicElementType,"BOOLEAN")) {
         return 1;
@@ -1401,19 +1407,21 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
 void addAssignment(parseTree** t, typeExpressionTable *T){
     // printf("Inside addAssignment\n%s\n%s\n\n", (*t)->symbolName, (*t)->lexeme);
     // printParseTree(*t);
+    int op = -1;
     if (!strcmp((*t)->symbolName, "assignment")){
         (*t)->children[0]->type = getExpression((*t)->children[0], T);
         addAssignment(&(*t)->children[2], T);
+        op = 4;
         //compare
     } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
         (*t)->type = getExpression(*t, T);
+        return;
     } else {
         if ((*t)->children[1] == NULL){
             addAssignment(&(*t)->children[0], T);
             (*t)->type = (*t)->children[0]->type;
             return;
         }
-        int op = -1;
         if (!strcmp((*t)->children[1]->symbolName, "OP_OR") || !strcmp((*t)->children[1]->symbolName, "OP_AND"))
             op = 1; //boolean
         else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MULT")) 
@@ -1430,44 +1438,90 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
         } else {
             addAssignment(&(*t)->children[2], T);
         }
-
-        if ((*t)->children[0]->type == NULL || (*t)->children[2]->type == NULL) {
-            (*t)->type = NULL;
-            printf("Error aa gayi\n");
-        } else {
-            if (op == 1){
-                // if ((*t)->children[0]->type->type == primitive && !strcmp((*t)->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
-                //     (*t)->children[2]->type->type == primitive && !strcmp((*t)->children[2]->type->exp->a->basicElementType,"BOOLEAN")) {
-                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
+    }
+    if ((*t)->children[0]->type == NULL || (*t)->children[2]->type == NULL) {
+        (*t)->type = NULL;
+        // printf("Error aa gayi %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+    } else {
+        if (op == 1){
+            // if ((*t)->children[0]->type->type == primitive && !strcmp((*t)->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
+            //     (*t)->children[2]->type->type == primitive && !strcmp((*t)->children[2]->type->exp->a->basicElementType,"BOOLEAN")) {
+            if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
+                (*t)->type = (*t)->children[0]->type;
+            } else {
+                (*t)->type = NULL;
+                printf("Type Error\
+                        Line Number: %d\
+                        Statement Type: Assignment\
+                        Operator\
+                        First Lexeme\n", (*t)->lineNumber);
+                printTypeExpressionTable((*t)->children[0]->type);
+                printf("Second Lexeme\
+                        Second Type: ");
+                printTypeExpressionTable((*t)->children[2]->type);
+                printf("Error aa gayi 1 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+            }
+        } else if (op == 2){
+            if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
                     (*t)->type = (*t)->children[0]->type;
-                } else {
-                    (*t)->type = NULL;
-                    printf("Error aa gayi 1\n");
-                }
-            } else if (op == 2){
-                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
-                        (*t)->type = (*t)->children[0]->type;
-                } else {
-                    (*t)->type = NULL;
-                    printf("Error aa gayi 1\n");
-                }
-            } else if (op == 3){
-                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
-                    typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                    temp->name = (char*)malloc(strlen("non-terminal"));
-                    strcpy(temp->name, "non-terminal");
-                    temp->type = primitive;
-                    temp->array_type = NA;
-                    temp->exp = (expression*)malloc(sizeof(expression));
-                    temp->exp->a = (prim*)malloc(sizeof(prim));
-                    temp->exp->a->basicElementType = (char*)malloc(strlen("REAL"));
-                    temp->next = NULL;
-                    strcpy(temp->exp->a->basicElementType,"REAL");
-                    (*t)->type = temp;
-                } else {
-                    (*t)->type = NULL;
-                    printf("Error aa gayi 1\n");
-                }
+            } else {
+                (*t)->type = NULL;
+                // printTypeExpressionTable((*t)->children[0]->type);
+                // printTypeExpressionTable((*t)->children[2]->type);
+                printf("Type Error\
+                        Line Number: %d\
+                        Statement Type: Assignment\
+                        Operator\
+                        First Lexeme\n", (*t)->lineNumber);
+                printTypeExpressionTable((*t)->children[0]->type);
+                printf("Second Lexeme\
+                        Second Type: ");
+                printTypeExpressionTable((*t)->children[2]->type);
+                printf("Error aa gayi 2 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+            }
+        } else if (op == 3){
+            if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
+                typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                temp->name = (char*)malloc(strlen("non-terminal"));
+                strcpy(temp->name, "non-terminal");
+                temp->type = primitive;
+                temp->array_type = NA;
+                temp->exp = (expression*)malloc(sizeof(expression));
+                temp->exp->a = (prim*)malloc(sizeof(prim));
+                temp->exp->a->basicElementType = (char*)malloc(strlen("REAL"));
+                temp->next = NULL;
+                strcpy(temp->exp->a->basicElementType,"REAL");
+                (*t)->type = temp;
+            } else {
+                (*t)->type = NULL;
+                printf("Type Error\
+                        Line Number: %d\
+                        Statement Type: Assignment\
+                        Operator\
+                        First Lexeme\n", (*t)->lineNumber);
+                printTypeExpressionTable((*t)->children[0]->type);
+                printf("Second Lexeme\
+                        Second Type: ");
+                printTypeExpressionTable((*t)->children[2]->type);
+                printf("Error aa gayi 3 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+            }
+        } else if (op == 4){
+            if (compare((*t)->children[0]->type, (*t)->children[2]->type, 1) || compare((*t)->children[0]->type, (*t)->children[2]->type, 2))
+                (*t)->type = (*t)->children[0]->type;
+            else {
+                (*t)->type = NULL;
+                // printTypeExpressionTable((*t)->children[0]->type);
+                // printTypeExpressionTable((*t)->children[2]->type);
+                printf("Type Error\
+                        Line Number: %d\
+                        Statement Type: Assignment\
+                        Operator\
+                        First Lexeme\n", (*t)->lineNumber);
+                printTypeExpressionTable((*t)->children[0]->type);
+                printf("Second Lexeme\
+                        Second Type: ");
+                printTypeExpressionTable((*t)->children[2]->type);
+                printf("Error aa gayi 4 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
             }
         }
     }
@@ -1493,10 +1547,10 @@ int traverseParseTree (parseTree **t, typeExpressionTable **T){
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable *T){
-    // printf ("Inside printTypeExpressionTable.\n");
+    printf ("Inside printTypeExpressionTable.\n");
     printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
-    while(l){
+    // while(l){
         printf("%s\t", l->name);
         if (l->type == primitive)
             printf("Primitive\t");
@@ -1547,7 +1601,7 @@ int printTypeExpressionTable (typeExpressionTable *T){
             printf("), basicElementType=INTEGER>");
         }
         printf("\n");
-        l = l->next;
-    }
+        // l = l->next;
+    // }
     return 0;
 }
