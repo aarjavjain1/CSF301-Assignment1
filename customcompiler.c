@@ -662,6 +662,7 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         current->children[childToPopulate]->tokenName = NULL;
         current->children[childToPopulate]->isLeaf = 0;
         current->children[childToPopulate]->symbolName = NULL;
+        current->children[childToPopulate]->lineNumber = 0;
         for (int i = 0; i<MAX_PARSE_TREE_CHILDREN; i++)
             current->children[childToPopulate]->children[i] = NULL;
         // printf("populated %s", Gi->grammarWord);
@@ -809,7 +810,7 @@ parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
 
 // Function Definition: printParseTree (parseTree *t)
 int printParseTreeWithDepth (parseTree *t, int currentDepth){
-    printf("Printing Tree ---- depth: %s ---- parseTreeNode: %s \n", currentDepth, t->symbolName);
+    printf("Printing Tree ---- depth: %d ---- line number: %d parseTreeNode: %s \n", currentDepth, t->lineNumber, t->symbolName);
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i])
             printParseTreeWithDepth(t->children[i], currentDepth + 1);
