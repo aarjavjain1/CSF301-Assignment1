@@ -873,13 +873,13 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
         // printf("Mai to ithhe paaji\n");
         for (int i = low_var; i <= high_var; i++){
             typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            temp->name = (char*)malloc(1+sizeof(char)*strlen(parseArray[i]->lexeme));
             strcpy(temp->name, parseArray[i]->lexeme);
             temp->type = primitive;
             temp->array_type = NA;
             temp->exp = (expression*)malloc(sizeof(expression));
             temp->exp->a = (prim*)malloc(sizeof(prim));
-            temp->exp->a->basicElementType = (char*)malloc(strlen(parseArray[colon+1]->symbolName));
+            temp->exp->a->basicElementType = (char*)malloc(1+sizeof(char)*strlen(parseArray[colon+1]->symbolName));
             temp->next = NULL;
             strcpy(temp->exp->a->basicElementType,parseArray[colon+1]->symbolName);
             if (*T == NULL) *T = temp;
@@ -893,7 +893,7 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
     else if (!strcmp(parseArray[colon+1]->symbolName, "ARRAY")){
         for (int i = low_var; i <= high_var; i++){
             typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            temp->name = (char*)malloc(1+sizeof(char)*strlen(parseArray[i]->lexeme));
             strcpy(temp->name, parseArray[i]->lexeme);
             temp->type = rect_array;
             temp->next = NULL;
@@ -912,12 +912,12 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
                         // if (!strcmp(parseArray[i+1], "VAR") || !strcmp(parseArray[i+3], "VAR")) stat = false;
                     if (!strcmp(parseArray[i+1]->symbolName, "VAR"))
                         lstat = false;
-                    rd->low = (char*)malloc(strlen(parseArray[i+1]->lexeme));
+                    rd->low = (char*)malloc(1+sizeof(char)*strlen(parseArray[i+1]->lexeme));
                     strcpy(rd->low, parseArray[i+1]->lexeme);
 
                     if (!strcmp(parseArray[i+3]->symbolName, "VAR"))
                         lstat = false;
-                    rd->high = (char*)malloc(strlen(parseArray[i+3]->lexeme));
+                    rd->high = (char*)malloc(1+sizeof(char)*strlen(parseArray[i+3]->lexeme));
                     strcpy(rd->high, parseArray[i+3]->lexeme);
                     rd->next = NULL;
                     if (temp->exp->b->d == NULL) temp->exp->b->d = rd;
@@ -944,7 +944,7 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
         int colon_loc = colon;
         for (int i = low_var; i <= high_var; i++, colon=colon_loc){
             typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-            temp->name = (char*)malloc(strlen(parseArray[i]->lexeme));
+            temp->name = (char*)malloc(1+sizeof(char)*strlen(parseArray[i]->lexeme));
             strcpy(temp->name, parseArray[i]->lexeme);
             temp->type = jagged_array;
             temp->array_type = NA;
@@ -988,6 +988,7 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
                         return;
                     }
                     jd->size = atoi(parseArray[colon+6]->lexeme);
+                    jd->inner_size = NULL;
                     jd->next = NULL;
                     int loop = jd->size;
                     colon += 10;
@@ -1091,7 +1092,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
         if(!strcmp(input->children[0]->symbolName,"VAR")){
             if(input->children[1] == NULL){
                 typeExpressionTable* temp = table;
-                while(strcmp(temp->name,input->children[0]->lexeme)){
+                while(temp && strcmp(temp->name,input->children[0]->lexeme)){
                     temp = temp->next;
                 }
                 return temp;
@@ -1107,7 +1108,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 }
                 rec = input->children[2];
                 typeExpressionTable* temp = table;
-                while(strcmp(temp->name,input->children[0]->lexeme)){
+                while(temp && strcmp(temp->name,input->children[0]->lexeme)){
                     temp = temp->next;
                 }
                 if (temp->type == jagged_array){
@@ -1180,6 +1181,22 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     }
                 }
                 else if (temp->type == rect_array){
+                    if(temp->array_type == dyn){
+                      if (numNums != temp->exp->b->dimensions)
+                          return NULL;
+                      else{
+                        typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                        temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                        strcpy(temp_->name,"non_terminal");
+                          temp_->next = NULL;
+                        temp_->type = primitive;
+                        temp_->exp = (expression *)malloc(sizeof(expression));
+                        temp_->exp->a = (prim *)malloc(sizeof(prim));
+                        temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                        strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                        return temp_;
+                      }
+                    }
                     if (numNums != temp->exp->b->dimensions)
                       return NULL;
                     rect_dimension* temp_rect = temp->exp->b->d;
@@ -1210,7 +1227,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
           //do this (same as above)
           if(input->children[1] == NULL){
               typeExpressionTable* temp = table;
-              while(strcmp(temp->name,input->children[0]->lexeme)){
+              while(temp && strcmp(temp->name,input->children[0]->lexeme)){
                   temp = temp->next;
               }
               return temp;
@@ -1226,7 +1243,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               }
               rec = input->children[2];
               typeExpressionTable* temp = table;
-              while(strcmp(temp->name,input->children[0]->lexeme)){
+              while(temp && strcmp(temp->name,input->children[0]->lexeme)){
                   temp = temp->next;
               }
               if (temp->type == jagged_array){
@@ -1299,6 +1316,22 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   }
               }
               else if (temp->type == rect_array){
+                if(temp->array_type == dyn){
+                  if (numNums != temp->exp->b->dimensions)
+                      return NULL;
+                  else{
+                    typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                    temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
+                    strcpy(temp_->name,"non_terminal");
+                      temp_->next = NULL;
+                    temp_->type = primitive;
+                    temp_->exp = (expression *)malloc(sizeof(expression));
+                    temp_->exp->a = (prim *)malloc(sizeof(prim));
+                    temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                    strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                    return temp_;
+                  }
+                }
                   if (numNums != temp->exp->b->dimensions)
                       return NULL;
                   rect_dimension* temp_rect = temp->exp->b->d;
@@ -1318,7 +1351,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
             // printf("Inside factor id\n\n\n\n");
             if(!strcmp(input->children[0]->children[0]->symbolName,"VAR")){
                 typeExpressionTable* temp = table;
-                while(strcmp(temp->name,input->children[0]->children[0]->lexeme)){
+                while(temp && strcmp(temp->name,input->children[0]->children[0]->lexeme)){
                     temp = temp->next;
                 }
                 return temp;
@@ -1354,7 +1387,7 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
         return 1;
     } else if (op == 2){
         if ((a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
-            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) || 
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) ||
             (a->type == primitive && !strcmp(a->exp->a->basicElementType,"REAL") &&
             b->type == primitive && !strcmp(b->exp->a->basicElementType,"REAL")))
             return 1;
@@ -1391,14 +1424,14 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
                 }
             }
             return ans;
-        }
+        }else return 0;
     } else if (op == 3){
         if ((a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
-            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) || 
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) ||
             (a->type == primitive && !strcmp(a->exp->a->basicElementType,"REAL") &&
             b->type == primitive && !strcmp(b->exp->a->basicElementType,"REAL"))) {
             return 1;
-        }
+        }else return 0;
     } else {
         return 0;
     }
@@ -1424,7 +1457,7 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
         }
         if (!strcmp((*t)->children[1]->symbolName, "OP_OR") || !strcmp((*t)->children[1]->symbolName, "OP_AND"))
             op = 1; //boolean
-        else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MULT")) 
+        else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MULT"))
             op = 2; //integer
         else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_DIV"))
             op = 3; //division
@@ -1482,13 +1515,13 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
         } else if (op == 3){
             if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
                 typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                temp->name = (char*)malloc(strlen("non-terminal"));
+                temp->name = (char*)malloc(1+sizeof(char)*strlen("non-terminal"));
                 strcpy(temp->name, "non-terminal");
                 temp->type = primitive;
                 temp->array_type = NA;
                 temp->exp = (expression*)malloc(sizeof(expression));
                 temp->exp->a = (prim*)malloc(sizeof(prim));
-                temp->exp->a->basicElementType = (char*)malloc(strlen("REAL"));
+                temp->exp->a->basicElementType = (char*)malloc(1+sizeof(char)*strlen("REAL"));
                 temp->next = NULL;
                 strcpy(temp->exp->a->basicElementType,"REAL");
                 (*t)->type = temp;
