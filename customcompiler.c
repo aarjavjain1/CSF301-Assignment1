@@ -11,6 +11,90 @@ This file implements all the necessary functions for the compiler to work.
 #define MAX_LEN 1000
 // Function Definition: readGrammar( “grammar.txt”, grammar G)
 
+void freeParseTreeNodeChildrenAll(parseTree *t){
+    if (t == NULL)
+        return;
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
+            freeParseTreeNodeChildrenAll(t->children[i]);
+    }
+    free(t);
+}
+
+void freeParseTreeNodeChildren(parseTree* t){
+    if (t == NULL)
+        return;
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
+        freeParseTreeNodeChildrenAll(t->children[i]);
+    }
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
+        t->children[i] = NULL;
+}
+
+void freeParseTreeMemory(parseTree *rootOfParseTree){
+    if (rootOfParseTree == NULL)
+        return;
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
+            freeParseTreeNodeChildrenAll(rootOfParseTree->children[i]);
+    }
+    free(rootOfParseTree->symbolName);
+    free(rootOfParseTree);
+}
+
+void freeRectDimensionMemory(rect_dimension* rd){
+    if (rd == NULL)
+        return;
+    if (rd->low)
+        free(rd->low);
+    if (rd->high)
+        free(rd->high);
+    freeRectDimensionMemory(rd->next);
+    free(rd);
+}
+
+void freeDimensionMemory(dimension* d){
+    if (d == NULL)
+        return;
+    freeDimensionMemory(d->next);
+    free(d);
+}
+
+void freeJaggedDimensionMemory(jagged_dimension* jd){
+    if (jd == NULL)
+        return;
+    freeDimensionMemory(jd->inner_size);
+    freeJaggedDimensionMemory(jd->next);
+    free(jd);
+}
+
+void freeTableExpression(expression* exp){
+    if (exp == NULL)
+        return;
+    if (exp->a)
+        if (exp->a->basicElementType)
+            free(exp->a->basicElementType);
+    if (exp->b){
+        if (exp->b->basicElementType)
+            free (exp->b->basicElementType);
+        freeRectDimensionMemory(exp->b->d);
+        free(exp->b);
+    }
+    if (exp->c){
+        if (exp->c->basicElementType)
+            free (exp->c->basicElementType);
+        freeJaggedDimensionMemory(exp->c->d);
+        free (exp->c);
+    }
+}
+
+void freeTypeExpressionTableMemory(typeExpressionTable* tablePointer){
+    if (tablePointer == NULL)
+        return;
+    if (tablePointer->name) free(tablePointer->name);
+    freeTableExpression(tablePointer->exp);
+    freeTypeExpressionTableMemory(tablePointer->next);
+    free(tablePointer);
+}
+
 void freeTokenStreamMemory(tokenStream* t){
     if (t == NULL)
         return;
@@ -584,25 +668,6 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         childToPopulate++;
         // other fields for this node in the parse tree will be filled in createParseTree if terminal on stack is detected
     }
-}
-
-void freeParseTreeNodeChildrenAll(parseTree *t){
-    if (t == NULL)
-        return;
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
-            freeParseTreeNodeChildrenAll(t->children[i]);
-    }
-    free(t);
-}
-
-void freeParseTreeNodeChildren(parseTree* t){
-    if (t == NULL)
-        return;
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
-        freeParseTreeNodeChildrenAll(t->children[i]);
-    }
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
-        t->children[i] = NULL;
 }
 
 int predictRule(int grammarRuleNum, grammarNode** G, tokenStream** recievedToken, grammarOrderNode **grammarOrderAddress, parseTree* t){
