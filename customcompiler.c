@@ -761,9 +761,9 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
     }
     parseIndex = 0;
     recurse(t);
-    for (int i = 0; i < parseIndex; i++) {
-        printf("%s ", parseArray[i]->symbolName);
-    }
+    // for (int i = 0; i < parseIndex; i++) {
+    //     printf("%s ", parseArray[i]->symbolName);
+    // }
     printf("\n");
     int low_var = 200000000, high_var = -200000000, colon = -1;
     for (int i = 0; i < parseIndex; i++) {
@@ -993,6 +993,33 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
     return;
 }
 
+int varType(int low, int high, int l){
+    // return
+    // -1 for error
+    // 0 for integer
+    // 1 for boolean
+    // 2 for real
+    // l checks whether it is rhs or lhs of assignment statement
+    if (low == high && l == 1){
+        if (!strcmp(parseArray[low]->symbolName, "NUMBER"))
+            return -1;
+    }
+
+}
+
+void addAssignment(parseTree* t, typeExpressionTable *T){
+    // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
+    for(int i = 0; i < MAX_VARIABLES; i++){
+        parseArray[i] = NULL;
+    }
+    parseIndex = 0;
+    recurse(t);
+    for (int i = 0; i < parseIndex; i++) {
+        printf("%s ", parseArray[i]->symbolName);
+    }
+    printf("\n");
+}
+
 // Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
 int traverseParseTree (parseTree *t, typeExpressionTable *T){
     // printf ("Inside traverseParseTree.\n");
@@ -1000,10 +1027,10 @@ int traverseParseTree (parseTree *t, typeExpressionTable *T){
         addDeclaration(t, T);
         return 0;
     }
-    // if (t != NULL && !strcmp(t->symbolName, "assignment")) {
-    //     addAssignment(t, T);
-    //     return 0;
-    // }
+    if (t != NULL && !strcmp(t->symbolName, "assignment")) {
+        addAssignment(t, T);
+        return 0;
+    }
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
         if (t->children[i])
             traverseParseTree(t->children[i], T);
@@ -1014,9 +1041,59 @@ int traverseParseTree (parseTree *t, typeExpressionTable *T){
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable *T){
     printf ("Inside printTypeExpressionTable.\n");
+    printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
     while(l){
-        printf("%s\n", l->name);
+        printf("%s\t", l->name);
+        if (l->type == primitive)
+            printf("Primitive\t");
+        else if (l->type == rect_array)
+            printf("Rectangular Array\t");
+        else if (l->type == jagged_array)
+            printf("Jagged Array\t");
+        if (l->array_type == stat)
+            printf("Static\t");
+        else if (l->array_type == dyn)
+            printf("Dynamic\t");
+        else if (l->array_type == NA)
+            printf("Not Applicable\t");
+        if (l->type == primitive){
+            printf("<type = %s>", l->exp->a->basicElementType);
+        }
+        else if (l->type == rect_array){
+            printf("<type=rectangularArray, dimensions=%d, ", l->exp->b->dimensions);
+            rect_dimension* temp = l->exp->b->d;
+            int count = 0;
+            while(temp){
+                count++;
+                printf("range_R%d=(%s,%s), ", count, temp->low, temp->high);
+                temp = temp->next;
+            }
+            printf("basicElementType=integer>");
+        }
+        else if (l->type == jagged_array){
+            printf("<type=jaggedArray, dimensions=%d, range_R1=(%d,%d), range_R2=(", l->exp->c->dimensions, l->exp->c->low, l->exp->c->high);
+            jagged_dimension* temp = l->exp->c->d;
+            int count = 1;
+            while(temp){
+                count++;
+                printf("%d", temp->size);
+                if (temp->inner_size){
+                    printf("[");
+                    dimension* in = temp->inner_size;
+                    while(in){
+                        printf("%d", in->size);
+                        if (in->next) printf(",");
+                        in = in->next;
+                    }
+                    printf("]");
+                }
+                if (temp->next) printf(",");
+                    temp = temp->next;
+            }
+            printf("), basicElementType=integer>");
+        }
+        printf("\n");
         l = l->next;
     }
     return 0;
