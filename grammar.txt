@@ -16,13 +16,6 @@ j_range_list -> range_list_2 OF INTEGER SEMICOLON index_def_list_3
 j_range_list -> range_list_3 OF INTEGER SEMICOLON index_def_list_3
 var_list -> VAR var_list
 var_list -> VAR VAR
-var -> start_char charlist
-start_char -> ALPHA
-start_char -> UNDERSCORE
-charlist -> charlist gchar
-gchar -> ALPHA
-gchar -> NUM
-gchar -> UNDERSCORE
 prim_type -> INTEGER
 prim_type -> BOOLEAN
 prim_type -> REAL

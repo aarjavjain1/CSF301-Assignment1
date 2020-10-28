@@ -994,31 +994,132 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
     return;
 }
 
-int varType(int low, int high, int l){
-    // return
-    // -1 for error
-    // 0 for integer
-    // 1 for boolean
-    // 2 for real
-    // l checks whether it is rhs or lhs of assignment statement
-    if (low == high && l == 1){
-        if (!strcmp(parseArray[low]->symbolName, "NUMBER"))
-            return -1;
+int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
+    if (op == 1 && a->type == primitive && !strcmp(a->exp->a->basicElementType,"BOOLEAN") &&
+        b->type == primitive && !strcmp(b->exp->a->basicElementType,"BOOLEAN")) {
+        return 1;
+    } else if (op == 2){
+        if ((a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) || 
+            (a->type == primitive && !strcmp(a->exp->a->basicElementType,"REAL") &&
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"REAL")))
+            return 1;
+        else if (a->type == rect_array && b->type == rect_array){
+            bool ans = true;
+            if (a->exp->b->dimensions != b->exp->b->dimensions) ans = false;
+            else {
+                rect_dimension* t1 = a->exp->b->d;
+                rect_dimension* t2 = b->exp->b->d;
+                while (t1 && t2){
+                    if (strcmp(t1->low, t2->low) || strcmp(t1->high, t2->high)) ans = false;
+                    t1 = t1->next;
+                    t2 = t2->next;
+                }
+            }
+            return ans;
+        } else if (a->type == jagged_array && b->type == jagged_array) {
+            bool ans = true;
+            if (a->exp->c->dimensions != b->exp->c->dimensions || a->exp->c->low != b->exp->c->low || a->exp->c->high != b->exp->c->high) ans = false;
+            else {
+                jagged_dimension* t1 = a->exp->c->d;
+                jagged_dimension* t2 = b->exp->c->d;
+                while (t1 && t2){
+                    if (t1->parent != t2->parent || t1->size != t2->size) ans = false;
+                    dimension* dt1 = t1->inner_size;
+                    dimension* dt2 = t2->inner_size;
+                    while (dt1 && dt2){
+                        if (dt1->size != dt2->size) ans = false;
+                        dt1 = dt1->next;
+                        dt2 = dt2->next;
+                    }
+                    t1 = t1->next;
+                    t2 = t2->next;
+                }
+            }
+            return ans;
+        }
+    } else if (op == 3){
+        if (a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) {
+            return 1;
+        }
+    } else {
+        return 0;
     }
-
 }
 
 void addAssignment(parseTree* t, typeExpressionTable *T){
     // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
-    for(int i = 0; i < MAX_VARIABLES; i++){
-        parseArray[i] = NULL;
+    if (!strcmp(t->symbolName, "assignment")){
+        getExpression(t->children[0], T);
+        addAssignment(t->children[2], T);
+        //compare
+    } else if (!strcmp(t->symbolName, "factor") || !strcmp(t->symbolName, "lhs")) {
+        getExpression(t, T);
+    } else {
+        if (t->children[1] == NULL){
+            addAssignment(t->children[0], T);
+            t->type = t->children[0]->type;
+            return;
+        }
+        int op = -1;
+        if (!strcmp(t->children[1]->symbolName, "OP_OR") || !strcmp(t->children[1]->symbolName, "OP_AND"))
+            op = 1;
+        else if (!strcmp(t->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp(t->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp(t->children[1]->children[0]->symbolName, "OP_MULT")) 
+            op = 2;
+        else if (!strcmp(t->children[1]->children[0]->symbolName, "OP_DIV"))
+            op = 3;
+        if (!strcmp(t->children[0]->symbolName, "factor")){
+            getExpression(t->children[0], T);
+        } else {
+            addAssignment(t->children[0], T);
+        }
+        if (!strcmp(t->children[2]->symbolName, "factor")){
+            getExpression(t->children[2], T);
+        } else {
+            addAssignment(t->children[2], T);
+        }
+
+        if (t->children[0]->type == NULL || t->children[2]->type == NULL) {
+            t->type = NULL;
+            printf("Error aa gayi\n");
+        } else {
+            if (op == 1){
+                // if (t->children[0]->type->type == primitive && !strcmp(t->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
+                //     t->children[2]->type->type == primitive && !strcmp(t->children[2]->type->exp->a->basicElementType,"BOOLEAN")) {
+                if (compare(t->children[0]->type, t->children[2]->type, op)){
+                        t->type = t->children[0]->type;
+                } else {
+                    t->type = NULL;
+                    printf("Error aa gayi 1\n");
+                }
+            } else if (op == 2){
+                if (compare(t->children[0]->type, t->children[2]->type, op)){
+                        t->type = t->children[0]->type;
+                } else {
+                    t->type = NULL;
+                    printf("Error aa gayi 1\n");
+                }
+            } else if (op == 3){
+                if (compare(t->children[0]->type, t->children[2]->type, op)){
+                    typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                    temp->name = (char*)malloc(strlen("non-terminal"));
+                    strcpy(temp->name, "non-terminal");
+                    temp->type = primitive;
+                    temp->array_type = NA;
+                    temp->exp = (expression*)malloc(sizeof(expression));
+                    temp->exp->a = (prim*)malloc(sizeof(prim));
+                    temp->exp->a->basicElementType = (char*)malloc(strlen("REAL"));
+                    temp->next = NULL;
+                    strcpy(temp->exp->a->basicElementType,"REAL");
+                    t->type = t->children[0]->type;
+                } else {
+                    t->type = NULL;
+                    printf("Error aa gayi 1\n");
+                }
+            }
+        }
     }
-    parseIndex = 0;
-    recurse(t);
-    for (int i = 0; i < parseIndex; i++) {
-        printf("%s ", parseArray[i]->symbolName);
-    }
-    printf("\n");
 }
 
 // Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
@@ -1041,7 +1142,7 @@ int traverseParseTree (parseTree *t, typeExpressionTable *T){
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable *T){
-    printf ("Inside printTypeExpressionTable.\n");
+    // printf ("Inside printTypeExpressionTable.\n");
     printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
     while(l){

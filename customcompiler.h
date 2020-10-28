@@ -14,7 +14,7 @@ Data Structures:
 #ifndef DATA_STRUCTURE_SIZES
 #define DATA_STRUCTURE_SIZES
     #define MAX_SIZE_OF_GRAMMAR_WORDS 40
-    #define NUMBER_OF_GRAMMAR_RULES 56
+    #define NUMBER_OF_GRAMMAR_RULES 49
     #define MAX_SIZE_OF_TOKEN_NAME MAX_SIZE_OF_GRAMMAR_WORDS
     #define MAX_SIZE_OF_INENTIFIER 21
     #define MAX_PARSE_TREE_CHILDREN 15
@@ -41,20 +41,6 @@ Data Structures:
         int lineNumber;
         struct tokenStreamStruct *next;
     }tokenStream;
-
-    // Data Structure: parseTree
-    typedef struct parseTreeStruct{
-        // data items
-        char *lexeme;
-        char *tokenName;
-        int isTerminal;
-        int lineNumber;
-        grammarNode* grammarRuleUsed;
-        char *symbolName;
-        int isLeaf;
-        // child pointer
-        struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
-    }parseTree;
 
     typedef struct StackNode {
         char* str;
@@ -121,6 +107,21 @@ Data Structures:
         expression* exp;
         struct typeExpTable* next;
     } typeExpressionTable;
+
+// Data Structure: parseTree
+    typedef struct parseTreeStruct{
+        // data items
+        char *lexeme;
+        char *tokenName;
+        int isTerminal;
+        int lineNumber;
+        grammarNode* grammarRuleUsed;
+        char *symbolName;
+        int isLeaf;
+        // child pointer
+        struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
+        typeExpressionTable* type;
+    }parseTree;
 
 #endif
 
