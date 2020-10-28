@@ -549,6 +549,8 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi){
         current->children[childToPopulate] = (parseTree*)malloc(sizeof(parseTree));
         current->children[childToPopulate]->isTerminal = terminal;
         current->children[childToPopulate]->grammarRuleUsed = NULL;
+        current->children[childToPopulate]->lexeme = NULL;
+        current->children[childToPopulate]->tokenName = NULL;
         current->children[childToPopulate]->isLeaf = 0;
         current->children[childToPopulate]->symbolName = NULL;
         for (int i = 0; i<MAX_PARSE_TREE_CHILDREN; i++)
@@ -754,13 +756,13 @@ void recurse(parseTree *t){
     }
 }
 
-void addDeclaration(parseTree* t, typeExpressionTable *T){
+void addDeclaration(parseTree** t, typeExpressionTable **T){
     // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
     for(int i = 0; i < MAX_VARIABLES; i++){
         parseArray[i] = NULL;
     }
     parseIndex = 0;
-    recurse(t);
+    recurse(*t);
     // for (int i = 0; i < parseIndex; i++) {
     //     printf("%s ", parseArray[i]->symbolName);
     // }
@@ -790,9 +792,9 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
             temp->exp->a->basicElementType = (char*)malloc(strlen(parseArray[colon+1]->symbolName));
             temp->next = NULL;
             strcpy(temp->exp->a->basicElementType,parseArray[colon+1]->symbolName);
-            if (T == NULL) T = temp;
+            if (*T == NULL) *T = temp;
             else {
-                typeExpressionTable* l = T;
+                typeExpressionTable* l = *T;
                 while(l->next) l = l->next;
                 l->next = temp;
             }
@@ -840,9 +842,9 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
             if (lstat) temp->array_type = stat;
             else temp->array_type = dyn;
             temp->exp->b->dimensions = dim;
-            if (T == NULL) T = temp;
+            if (*T == NULL) *T = temp;
             else {
-                typeExpressionTable* l = T;
+                typeExpressionTable* l = *T;
                 while(l->next) l = l->next;
                 l->next = temp;
             }
@@ -968,9 +970,9 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
                 }
             }
             temp->exp->b->dimensions = dim;
-            if (T == NULL) T = temp;
+            if (*T == NULL) *T = temp;
             else {
-                typeExpressionTable* l = T;
+                typeExpressionTable* l = *T;
                 while(l->next) l = l->next;
                 l->next = temp;
             }
@@ -979,7 +981,6 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
     else {
         printf("Traversal Error Occured\n");
     }
-    printTypeExpressionTable(T);
 
     // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
     //     if (t->children[i])
@@ -992,6 +993,263 @@ void addDeclaration(parseTree* t, typeExpressionTable *T){
     // }
     // printf("\n");.
     return;
+}
+
+typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table){
+    // printf("Inside getExpression\n\n\n\n");
+    if(!strcmp(input->symbolName,"lhs")){
+        if(!strcmp(input->children[0]->symbolName,"VAR")){
+            if(input->children[1] == NULL){
+                typeExpressionTable* temp = table;
+                while(strcmp(temp->name,input->children[0]->lexeme)){
+                    temp = temp->next;
+                }
+                return temp;
+            }
+            else if(!strcmp(input->children[1]->symbolName,"LSQUARE")){
+              //do this
+                int numNums = 0;
+                // while(input->children[2]->children[numNums]!=NULL) numNums++;
+                parseTree* rec = input->children[2];
+                while(rec){
+                    numNums++;
+                    rec = rec->children[1];
+                }
+                rec = input->children[2];
+                typeExpressionTable* temp = table;
+                while(strcmp(temp->name,input->children[0]->lexeme)){
+                    temp = temp->next;
+                }
+                if (temp->type == jagged_array){
+                    if (numNums != temp->exp->c->dimensions)
+                        return NULL;
+                    jagged* dim_details = temp->exp->c;
+                    int dimensions = temp->exp->c->dimensions;
+                    if(dimensions == 2){
+                        int low_1 = dim_details->low;
+                        int high_1 = dim_details->high;
+                        int s1 = atoi(rec->children[0]->lexeme);
+                        int s2 = atoi(rec->children[1]->children[0]->lexeme);
+                        if(s1<low_1 || s1>high_1)
+                            return NULL;
+                        jagged_dimension* inner_details = dim_details->d;
+                        while(inner_details && s1 != inner_details->parent){
+                            inner_details = inner_details->next;
+                            // s1--;
+                        }
+                        int high_2 = inner_details->size;
+                        if(s2>=high_2)
+                            return NULL;
+
+                        typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
+                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                        temp_->type = primitive;
+                        temp_->exp = (expression *)malloc(sizeof(expression));
+                        temp_->exp->a = (prim *)malloc(sizeof(prim));
+                        temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                        strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                        return temp_;
+                    }
+                    else if(dimensions == 3){
+                        int low_1 = dim_details->low;
+                        int high_1 = dim_details->high;
+                        int s1 = atoi(rec->children[0]->lexeme);
+                        int s2 = atoi(rec->children[1]->children[0]->lexeme);
+                        int s3 = atoi(rec->children[1]->children[1]->children[0]->lexeme);
+                        if(s1<low_1 || s1>high_1)
+                            return NULL;
+                        jagged_dimension* inner_details = dim_details->d;
+                        while(s1>low_1){
+                            inner_details = inner_details->next;
+                            s1--;
+                        }
+                        int high_2 = inner_details->size;
+                        if(s2>=high_2)
+                            return NULL;
+                        dimension* inner_inner_details = inner_details->inner_size;
+                        int high_3 = 1;
+                        while(inner_inner_details->next != NULL){
+                          high_3++;
+                          inner_inner_details = inner_inner_details->next;
+                        }
+                        if(s3>=high_3)
+                            return NULL;
+
+                        typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
+                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                        temp_->type = primitive;
+                        temp_->exp = (expression *)malloc(sizeof(expression));
+                        temp_->exp->a = (prim *)malloc(sizeof(prim));
+                        temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                        strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                        return temp_;
+                    }
+                }
+                else if (temp->type == rect_array){
+                    if (numNums != temp->exp->b->dimensions)
+                      return NULL;
+                    rect_dimension* temp_rect = temp->exp->b->d;
+                    while(temp_rect!=NULL){
+                        int dim_ = atoi(rec->children[0]->symbolName);
+                        int high = atoi(temp_rect->high);
+                        int low = atoi(temp_rect->low);
+                        if(dim_<low || dim_>high)
+                            return NULL;
+                        temp_rect = temp_rect->next;
+                        rec = rec->children[1];
+                    }
+                }
+
+            }
+            else{
+                printf("This should not have occured lhs !->var lsq || var \n");
+                return NULL;
+            }
+        }
+        else{
+            printf("This should not have occured lhs !-> var\n");
+            return NULL;
+        }
+    }
+    else if(!strcmp(input->symbolName,"factor")){
+        if(!strcmp(input->children[0]->symbolName,"VAR")){
+          //do this (same as above)
+          if(input->children[1] == NULL){
+              typeExpressionTable* temp = table;
+              while(strcmp(temp->name,input->children[0]->lexeme)){
+                  temp = temp->next;
+              }
+              return temp;
+          }
+          else if(!strcmp(input->children[1]->symbolName,"LSQUARE")){
+            //do this
+              int numNums = 0;
+              // while(input->children[2]->children[numNums]!=NULL) numNums++;
+              parseTree* rec = input->children[2];
+              while(rec){
+                  numNums++;
+                  rec = rec->children[1];
+              }
+              rec = input->children[2];
+              typeExpressionTable* temp = table;
+              while(strcmp(temp->name,input->children[0]->lexeme)){
+                  temp = temp->next;
+              }
+              if (temp->type == jagged_array){
+                  if (numNums != temp->exp->c->dimensions)
+                      return NULL;
+                  jagged* dim_details = temp->exp->c;
+                  int dimensions = temp->exp->c->dimensions;
+                  if(dimensions == 2){
+                      int low_1 = dim_details->low;
+                      int high_1 = dim_details->high;
+                      int s1 = atoi(rec->children[0]->lexeme);
+                      int s2 = atoi(rec->children[1]->children[0]->lexeme);
+                      if(s1<low_1 || s1>high_1)
+                          return NULL;
+                      jagged_dimension* inner_details = dim_details->d;
+                      while(s1>low_1){
+                          inner_details = inner_details->next;
+                          s1--;
+                      }
+                      int high_2 = inner_details->size;
+                      if(s2>=high_2)
+                          return NULL;
+
+                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
+                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                      temp_->type = primitive;
+                      temp_->exp = (expression *)malloc(sizeof(expression));
+                      temp_->exp->a = (prim *)malloc(sizeof(prim));
+                      temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                      strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                      return temp_;
+                  }
+                  else if(dimensions == 3){
+                      int low_1 = dim_details->low;
+                      int high_1 = dim_details->high;
+                      int s1 = atoi(rec->children[0]->lexeme);
+                      int s2 = atoi(rec->children[1]->children[0]->lexeme);
+                      int s3 = atoi(rec->children[1]->children[1]->children[0]->lexeme);
+                      if(s1<low_1 || s1>high_1)
+                          return NULL;
+                      jagged_dimension* inner_details = dim_details->d;
+                      while(s1>low_1){
+                          inner_details = inner_details->next;
+                          s1--;
+                      }
+                      int high_2 = inner_details->size;
+                      if(s2>=high_2)
+                          return NULL;
+                      dimension* inner_inner_details = inner_details->inner_size;
+                      int high_3 = 1;
+                      while(inner_inner_details->next != NULL){
+                        high_3++;
+                        inner_inner_details = inner_inner_details->next;
+                      }
+                      if(s3>=high_3)
+                          return NULL;
+
+                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
+                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
+                      temp_->type = primitive;
+                      temp_->exp = (expression *)malloc(sizeof(expression));
+                      temp_->exp->a = (prim *)malloc(sizeof(prim));
+                      temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                      strcpy(temp_->exp->a->basicElementType,"INTEGER");
+                      return temp_;
+                  }
+              }
+              else if (temp->type == rect_array){
+                  if (numNums != temp->exp->b->dimensions)
+                      return NULL;
+                  rect_dimension* temp_rect = temp->exp->b->d;
+                  while(temp_rect!=NULL){
+                      int dim_ = atoi(rec->children[0]->symbolName);
+                      int high = atoi(temp_rect->high);
+                      int low = atoi(temp_rect->low);
+                      if(dim_<low || dim_>high)
+                          return NULL;
+                      temp_rect = temp_rect->next;
+                      rec = rec->children[1];
+                  }
+              }
+            }
+        }
+        else if(!strcmp(input->children[0]->symbolName,"id")){
+            // printf("Inside factor id\n\n\n\n");
+            if(!strcmp(input->children[0]->children[0]->symbolName,"VAR")){
+                typeExpressionTable* temp = table;
+                while(strcmp(temp->name,input->children[0]->children[0]->lexeme)){
+                    temp = temp->next;
+                }
+                return temp;
+            }
+            else if (!strcmp(input->children[0]->children[0]->symbolName,"NUMBER")){
+                typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                temp->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
+                strcpy(temp->name,input->children[0]->children[0]->symbolName);
+                temp->type = primitive;
+                temp->exp = (expression *)malloc(sizeof(expression));
+                temp->exp->a = (prim *)malloc(sizeof(prim));
+                temp->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("INTEGER"));
+                strcpy(temp->exp->a->basicElementType,"INTEGER");
+                return temp;
+            }
+            else{
+                printf("This should not have occured id!->VAR || NUMBER");
+                return NULL;
+            }
+        }
+        else{
+            printf("This should not have occured factor !-> VAR || id\n");
+            return NULL;
+        }
+    }
 }
 
 int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
@@ -1039,8 +1297,10 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
             return ans;
         }
     } else if (op == 3){
-        if (a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
-            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) {
+        if ((a->type == primitive && !strcmp(a->exp->a->basicElementType,"INTEGER") &&
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"INTEGER")) || 
+            (a->type == primitive && !strcmp(a->exp->a->basicElementType,"REAL") &&
+            b->type == primitive && !strcmp(b->exp->a->basicElementType,"REAL"))) {
             return 1;
         }
     } else {
@@ -1048,60 +1308,61 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op){
     }
 }
 
-void addAssignment(parseTree* t, typeExpressionTable *T){
-    // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
-    if (!strcmp(t->symbolName, "assignment")){
-        getExpression(t->children[0], T);
-        addAssignment(t->children[2], T);
+void addAssignment(parseTree** t, typeExpressionTable *T){
+    // printf("Inside addAssignment\n%s\n%s\n\n", (*t)->symbolName, (*t)->lexeme);
+    // printParseTree(*t);
+    if (!strcmp((*t)->symbolName, "assignment")){
+        (*t)->children[0]->type = getExpression((*t)->children[0], T);
+        addAssignment(&(*t)->children[2], T);
         //compare
-    } else if (!strcmp(t->symbolName, "factor") || !strcmp(t->symbolName, "lhs")) {
-        getExpression(t, T);
+    } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
+        (*t)->type = getExpression(*t, T);
     } else {
-        if (t->children[1] == NULL){
-            addAssignment(t->children[0], T);
-            t->type = t->children[0]->type;
+        if ((*t)->children[1] == NULL){
+            addAssignment(&(*t)->children[0], T);
+            (*t)->type = (*t)->children[0]->type;
             return;
         }
         int op = -1;
-        if (!strcmp(t->children[1]->symbolName, "OP_OR") || !strcmp(t->children[1]->symbolName, "OP_AND"))
-            op = 1;
-        else if (!strcmp(t->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp(t->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp(t->children[1]->children[0]->symbolName, "OP_MULT")) 
-            op = 2;
-        else if (!strcmp(t->children[1]->children[0]->symbolName, "OP_DIV"))
-            op = 3;
-        if (!strcmp(t->children[0]->symbolName, "factor")){
-            getExpression(t->children[0], T);
+        if (!strcmp((*t)->children[1]->symbolName, "OP_OR") || !strcmp((*t)->children[1]->symbolName, "OP_AND"))
+            op = 1; //boolean
+        else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MINUS") || !strcmp((*t)->children[1]->children[0]->symbolName, "OP_MULT")) 
+            op = 2; //integer
+        else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_DIV"))
+            op = 3; //division
+        if (!strcmp((*t)->children[0]->symbolName, "factor")){
+            (*t)->children[0]->type = getExpression((*t)->children[0], T);
         } else {
-            addAssignment(t->children[0], T);
+            addAssignment(&(*t)->children[0], T);
         }
-        if (!strcmp(t->children[2]->symbolName, "factor")){
-            getExpression(t->children[2], T);
+        if (!strcmp((*t)->children[2]->symbolName, "factor")){
+            (*t)->children[2]->type = getExpression((*t)->children[2], T);
         } else {
-            addAssignment(t->children[2], T);
+            addAssignment(&(*t)->children[2], T);
         }
 
-        if (t->children[0]->type == NULL || t->children[2]->type == NULL) {
-            t->type = NULL;
+        if ((*t)->children[0]->type == NULL || (*t)->children[2]->type == NULL) {
+            (*t)->type = NULL;
             printf("Error aa gayi\n");
         } else {
             if (op == 1){
-                // if (t->children[0]->type->type == primitive && !strcmp(t->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
-                //     t->children[2]->type->type == primitive && !strcmp(t->children[2]->type->exp->a->basicElementType,"BOOLEAN")) {
-                if (compare(t->children[0]->type, t->children[2]->type, op)){
-                        t->type = t->children[0]->type;
+                // if ((*t)->children[0]->type->type == primitive && !strcmp((*t)->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
+                //     (*t)->children[2]->type->type == primitive && !strcmp((*t)->children[2]->type->exp->a->basicElementType,"BOOLEAN")) {
+                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
+                    (*t)->type = (*t)->children[0]->type;
                 } else {
-                    t->type = NULL;
+                    (*t)->type = NULL;
                     printf("Error aa gayi 1\n");
                 }
             } else if (op == 2){
-                if (compare(t->children[0]->type, t->children[2]->type, op)){
-                        t->type = t->children[0]->type;
+                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
+                        (*t)->type = (*t)->children[0]->type;
                 } else {
-                    t->type = NULL;
+                    (*t)->type = NULL;
                     printf("Error aa gayi 1\n");
                 }
             } else if (op == 3){
-                if (compare(t->children[0]->type, t->children[2]->type, op)){
+                if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)){
                     typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
                     temp->name = (char*)malloc(strlen("non-terminal"));
                     strcpy(temp->name, "non-terminal");
@@ -1112,9 +1373,9 @@ void addAssignment(parseTree* t, typeExpressionTable *T){
                     temp->exp->a->basicElementType = (char*)malloc(strlen("REAL"));
                     temp->next = NULL;
                     strcpy(temp->exp->a->basicElementType,"REAL");
-                    t->type = t->children[0]->type;
+                    (*t)->type = temp;
                 } else {
-                    t->type = NULL;
+                    (*t)->type = NULL;
                     printf("Error aa gayi 1\n");
                 }
             }
@@ -1123,19 +1384,19 @@ void addAssignment(parseTree* t, typeExpressionTable *T){
 }
 
 // Function Definition: traverseParseTree (parseTree *t, typeExpressionTable T)
-int traverseParseTree (parseTree *t, typeExpressionTable *T){
+int traverseParseTree (parseTree **t, typeExpressionTable **T){
     // printf ("Inside traverseParseTree.\n");
-    if (t != NULL && !strcmp(t->symbolName, "declaration")) {
+    if (t != NULL && !strcmp((*t)->symbolName, "declaration")) {
         addDeclaration(t, T);
         return 0;
     }
-    if (t != NULL && !strcmp(t->symbolName, "assignment")) {
-        addAssignment(t, T);
+    if (t != NULL && !strcmp((*t)->symbolName, "assignment")) {
+        addAssignment(t, *T);
         return 0;
     }
     for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
-        if (t->children[i])
-            traverseParseTree(t->children[i], T);
+        if ((*t)->children[i])
+            traverseParseTree(&((*t)->children[i]), T);
     }
     return 0;
 }
@@ -1171,7 +1432,7 @@ int printTypeExpressionTable (typeExpressionTable *T){
                 printf("range_R%d=(%s,%s), ", count, temp->low, temp->high);
                 temp = temp->next;
             }
-            printf("basicElementType=integer>");
+            printf("basicElementType=INTEGER>");
         }
         else if (l->type == jagged_array){
             printf("<type=jaggedArray, dimensions=%d, range_R1=(%d,%d), range_R2=(", l->exp->c->dimensions, l->exp->c->low, l->exp->c->high);
@@ -1193,265 +1454,10 @@ int printTypeExpressionTable (typeExpressionTable *T){
                 if (temp->next) printf(",");
                     temp = temp->next;
             }
-            printf("), basicElementType=integer>");
+            printf("), basicElementType=INTEGER>");
         }
         printf("\n");
         l = l->next;
     }
     return 0;
-}
-
-typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table){
-    if(!strcmp(input->symbolName,"lhs")){
-        if(!strcmp(input->children[0]->symbolName,"VAR")){
-            if(input->children[1] == NULL){
-                typeExpressionTable* temp = table;
-                while(!strcmp(table->name,input->children[0]->lexeme)){
-                    temp = temp->next;
-                }
-                return temp;
-            }
-            else if(!strcmp(input->children[1]->symbolName,"LSQUARE")){
-              //do this
-                int numNums = 0;
-                // while(input->children[2]->children[numNums]!=NULL) numNums++;
-                parseTree* rec = input->children[2];
-                while(rec){
-                    numNums++;
-                    rec = rec->children[1];
-                }
-                rec = input->children[2];
-                typeExpressionTable* temp = table;
-                while(!strcmp(table->name,input->children[0]->lexeme)){
-                    temp = temp->next;
-                }
-                if (temp->type == jagged_array){
-                    if (numNums != temp->exp->c->dimensions)
-                        return NULL;
-                    jagged* dim_details = temp->exp->c;
-                    int dimensions = temp->exp->c->dimensions;
-                    if(dimensions == 2){
-                        int low_1 = dim_details->low;
-                        int high_1 = dim_details->high;
-                        int s1 = atoi(rec->children[0]);
-                        int s2 = atoi(rec->children[1]->children[0]);
-                        if(s1<low_1 || s1>high_1)
-                            return NULL;
-                        jagged_dimension* inner_details = dim_details->d;
-                        while(s1>low_1){
-                            inner_details = inner_details->next;
-                            s1--;
-                        }
-                        int high_2 = inner_details->size;
-                        if(s2>=high_2)
-                            return NULL;
-
-                        typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
-                        temp_->type = primitive;
-                        temp_->exp = (expression *)malloc(sizeof(expression));
-                        temp_->exp->a = (prim *)malloc(sizeof(prim));
-                        temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("integer"));
-                        strcpy(temp_->exp->a->basicElementType,"integer");
-                        return temp_;
-                    }
-                    else if(dimensions == 3){
-                        int low_1 = dim_details->low;
-                        int high_1 = dim_details->high;
-                        int s1 = atoi(rec->children[0]);
-                        int s2 = atoi(rec->children[1]->children[0]);
-                        int s3 = atoi(rec->children[1]->children[1]->children[0]);
-                        if(s1<low_1 || s1>high_1)
-                            return NULL;
-                        jagged_dimension* inner_details = dim_details->d;
-                        while(s1>low_1){
-                            inner_details = inner_details->next;
-                            s1--;
-                        }
-                        int high_2 = inner_details->size;
-                        if(s2>=high_2)
-                            return NULL;
-                        dimension* inner_inner_details = inner_details->inner_size;
-                        int high_3 = 1;
-                        while(inner_inner_details->next != NULL){
-                          high_3++;
-                          inner_inner_details = inner_inner_details->next;
-                        }
-                        if(s3>=high_3)
-                            return NULL;
-
-                        typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                        temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                        strcpy(temp_->name,input->children[0]->children[0]->symbolName);
-                        temp_->type = primitive;
-                        temp_->exp = (expression *)malloc(sizeof(expression));
-                        temp_->exp->a = (prim *)malloc(sizeof(prim));
-                        temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("integer"));
-                        strcpy(temp_->exp->a->basicElementType,"integer");
-                        return temp_;
-                    }
-                }
-                else if (temp->type == rect_array){
-                    if (numNums != temp->exp->b->dimensions)
-                      return NULL;
-                    rect_dimension* temp_rect = temp->exp->b->d;
-                    while(temp_rect!=NULL){
-                        int dim_ = atoi(rec->children[0]->name);
-                        int high = atoi(temp_rect->high);
-                        int low = atoi(temp_rect->low);
-                        if(dim_<low || dim_>high)
-                            return NULL:
-                        temp_rect = temp_rect->next;
-                        rec = rec->children[1];
-                    }
-                }
-
-            }
-            else{
-                printf("This should not have occured lhs !->var lsq || var \n");
-                return NULL;
-            }
-        }
-        else{
-            printf("This should not have occured lhs !-> var\n");
-            return NULL;
-        }
-    }
-    else if(!strcmp(input->symbolName->symbolName,"factor")){
-        if(!strcmp(input->children[0]->symbolName,"VAR")){
-          //do this (same as above)
-          if(input->children[1] == NULL){
-              typeExpressionTable* temp = table;
-              while(!strcmp(table->name,input->children[0]->lexeme)){
-                  temp = temp->next;
-              }
-              return temp;
-          }
-          else if(!strcmp(input->children[1]->symbolName,"LSQUARE")){
-            //do this
-              int numNums = 0;
-              // while(input->children[2]->children[numNums]!=NULL) numNums++;
-              parseTree* rec = input->children[2];
-              while(rec){
-                  numNums++;
-                  rec = rec->children[1];
-              }
-              rec = input->children[2];
-              typeExpressionTable* temp = table;
-              while(!strcmp(table->name,input->children[0]->lexeme)){
-                  temp = temp->next;
-              }
-              if (temp->type == jagged_array){
-                  if (numNums != temp->exp->c->dimensions)
-                      return NULL;
-                  jagged* dim_details = temp->exp->c;
-                  int dimensions = temp->exp->c->dimensions;
-                  if(dimensions == 2){
-                      int low_1 = dim_details->low;
-                      int high_1 = dim_details->high;
-                      int s1 = atoi(rec->children[0]);
-                      int s2 = atoi(rec->children[1]->children[0]);
-                      if(s1<low_1 || s1>high_1)
-                          return NULL;
-                      jagged_dimension* inner_details = dim_details->d;
-                      while(s1>low_1){
-                          inner_details = inner_details->next;
-                          s1--;
-                      }
-                      int high_2 = inner_details->size;
-                      if(s2>=high_2)
-                          return NULL;
-
-                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
-                      temp_->type = primitive;
-                      temp_->exp = (expression *)malloc(sizeof(expression));
-                      temp_->exp->a = (prim *)malloc(sizeof(prim));
-                      temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("integer"));
-                      strcpy(temp_->exp->a->basicElementType,"integer");
-                      return temp_;
-                  }
-                  else if(dimensions == 3){
-                      int low_1 = dim_details->low;
-                      int high_1 = dim_details->high;
-                      int s1 = atoi(rec->children[0]);
-                      int s2 = atoi(rec->children[1]->children[0]);
-                      int s3 = atoi(rec->children[1]->children[1]->children[0]);
-                      if(s1<low_1 || s1>high_1)
-                          return NULL;
-                      jagged_dimension* inner_details = dim_details->d;
-                      while(s1>low_1){
-                          inner_details = inner_details->next;
-                          s1--;
-                      }
-                      int high_2 = inner_details->size;
-                      if(s2>=high_2)
-                          return NULL;
-                      dimension* inner_inner_details = inner_details->inner_size;
-                      int high_3 = 1;
-                      while(inner_inner_details->next != NULL){
-                        high_3++;
-                        inner_inner_details = inner_inner_details->next;
-                      }
-                      if(s3>=high_3)
-                          return NULL;
-
-                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                      temp_->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                      strcpy(temp_->name,input->children[0]->children[0]->symbolName);
-                      temp_->type = primitive;
-                      temp_->exp = (expression *)malloc(sizeof(expression));
-                      temp_->exp->a = (prim *)malloc(sizeof(prim));
-                      temp_->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("integer"));
-                      strcpy(temp_->exp->a->basicElementType,"integer");
-                      return temp_;
-                  }
-              }
-              else if (temp->type == rect_array){
-                  if (numNums != temp->exp->b->dimensions)
-                      return NULL;
-                  rect_dimension* temp_rect = temp->exp->b->d;
-                  while(temp_rect!=NULL){
-                      int dim_ = atoi(rec->children[0]->name);
-                      int high = atoi(temp_rect->high);
-                      int low = atoi(temp_rect->low);
-                      if(dim_<low || dim_>high)
-                          return NULL:
-                      temp_rect = temp_rect->next;
-                      rec = rec->children[1];
-                  }
-              }
-            }
-        }
-        else if(!strcmp(input->children[0]->symbolName,"id")){
-            if(!strcmp(input->children[0]->children[0]->symbolName,"VAR")){
-                typeExpressionTable* temp = table;
-                while(!strcmp(table->name,input->children[0]->children[0]->lexeme)){
-                    temp = temp->next;
-                }
-                return temp;
-            }
-            else if (!strcmp(input->children[0]->children[0]->symbolName,"NUMBER")){
-                typeExpressionTable* temp = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                temp->name = (char*)malloc(sizeof(char)*strlen(input->children[0]->children[0]->symbolName));
-                strcpy(temp->name,input->children[0]->children[0]->symbolName);
-                temp->type = primitive;
-                temp->exp = (expression *)malloc(sizeof(expression));
-                temp->exp->a = (prim *)malloc(sizeof(prim));
-                temp->exp->a->basicElementType = (char *)malloc(sizeof(char)*strlen("integer"));
-                strcpy(temp->exp->a->basicElementType,"integer");
-                return temp;
-            }
-            else{
-                printf("This should not have occured id!->VAR || NUMBER");
-                return NULL;
-            }
-        }
-        else{
-            printf("This should not have occured factor !-> VAR || id\n");
-            return NULL;
-        }
-    }
 }

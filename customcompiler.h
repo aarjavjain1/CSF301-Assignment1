@@ -138,7 +138,7 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s);
 parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G);
 
 // Function Prototype: traverseParseTree (parseTree *t, typeExpressionTable T)
-int traverseParseTree (parseTree *t, typeExpressionTable *T);
+int traverseParseTree (parseTree **t, typeExpressionTable **T);
 
 // Function Prototype: printParseTree (parseTree *t)
 int printParseTree (parseTree *t);

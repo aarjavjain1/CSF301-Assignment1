@@ -47,14 +47,15 @@ int main(int argc, char* argv[]){
                 ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
 
                 printf ("Parse tree creation works\n\n");
-                traverseParseTree(ParseTree, TypeExpressionTable);
+                traverseParseTree(&ParseTree, &TypeExpressionTable);
+                printTypeExpressionTable(TypeExpressionTable);
 
-                printf ("Parse tree traversal: In Progress\n\n");
+                // printf ("Parse tree traversal: In Progress\n\n");
                 break;
             }
             case 2:{
                 // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
-                traverseParseTree(ParseTree, TypeExpressionTable);
+                // traverseParseTree(ParseTree, TypeExpressionTable);
 
                 printf ("Parse tree traversal: yet to be implemented\n\n");
                 break;
