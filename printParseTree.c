@@ -18,38 +18,38 @@ int printParseTree(parseTree *t) {
     if (t == NULL)
         return 1;
     if (t->depth == 0)
-        printf ("Symbol\tisTerminal\tType Expression\tlexeme\tLine Number\tGrammar Rule Number\tDepth\n");
-    printf("%s \t", t->symbolName);
+        printf ("%20s\t%10s\t%10s\t%5s\t%15s\t%5s\t%50s\n", "Symbol", "isTerminal", "Lexeme", "Line Number", "Grammar Rule Number", "Depth", "Type Expression");
+    printf("%20s\t", t->symbolName);
     if (t->isTerminal){
-        printf("true \t");
+        printf("%10s\t","True");
     } else {
-        printf("false \t");
+        printf("%10s\t","False");
     }
+    if (t->lexeme) {
+        printf("%10s\t", t->lexeme);
+    } else {
+        printf("%10s\t", "-");
+    }
+    // if (t->isLeaf) {
+    //     printf("%d \t", t->lineNumber);
+    // } else {
+    //     printf("- \t");
+    // }
+    printf("%5d\t", getLineNumber(t));
     if (!(t->isLeaf)) {
+        printf("%11s %3d\t", "Rule Number", t->grammarRuleUsed->grammarRuleNum);
+    } else {
+        printf("%15s\t", "-");
+    }
+    printf("%5d\t", t->depth);
+    if (!(t->isLeaf) && t->type) {
         printTypeExpression(t->type);
         printf("\t");
     } else {
-        printf ("- \t");
-    } 
-    if (t->isLeaf) {
-        printf("%s \t", t->lexeme);
-    } else {
-        printf("- \t");
+        printf ("%50s\t", "-");
     }
-    if (t->isLeaf) {
-        printf("%d \t", t->lineNumber);
-    } else {
-        printf("- \t");
-    }
-    if (!(t->isLeaf)) {
-        printf("Rule %d \t", t->grammarRuleUsed->grammarRuleNum);
-    } else {
-        printf("- \t");
-    }
-    printf("%d \t", t->depth);
     printf("\n");
     //line, grammar, depth
-    
     // print children
     for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++) {
         if (t->children[i])

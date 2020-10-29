@@ -151,6 +151,8 @@ int printParseTree (parseTree *t);
 void printTypeExpression (typeExpressionTable *T);
 void printTypeExpressionTable (typeExpressionTable *T);
 
+int getLineNumber(parseTree* t);
+
 
 /////////////////////////////UTILITY FUNCTION PROTOTYPES//////////////////////////////////
 
