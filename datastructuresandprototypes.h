@@ -147,7 +147,8 @@ int traverseParseTree (parseTree **t, typeExpressionTable **T);
 int printParseTree (parseTree *t);
 
 // Function Prototype: printTypeExpressionTable (typeExpressionTable T)
-int printTypeExpressionTable (typeExpressionTable *T);
+void printTypeExpression (typeExpressionTable *T);
+void printTypeExpressionTable (typeExpressionTable *T);
 
 
 /////////////////////////////UTILITY FUNCTION PROTOTYPES//////////////////////////////////
