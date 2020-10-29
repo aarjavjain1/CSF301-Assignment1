@@ -383,14 +383,14 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 if (temp->type == jagged_array){
                   if(temp->array_type == dyn){
                     if (numNums != temp->exp->b->dimensions){
-                        strcpy(*msg,"Element at index is not primitive\n");
+                        strcpy(*msg,"Invalid number of dimensions\n");
                         return NULL;
                     }
                     else{
                       typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
                       temp_->name = (char*)malloc(sizeof(char)*strlen("non_terminal"));
                       strcpy(temp_->name,"non_terminal");
-                        temp_->next = NULL;
+                      temp_->next = NULL;
                       temp_->type = primitive;
                       temp_->exp = (expression *)malloc(sizeof(expression));
                       temp_->exp->a = (prim *)malloc(sizeof(prim));
@@ -400,22 +400,20 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     }
                   }
                     if (numNums != temp->exp->c->dimensions){
-                        if(flag){
-                          strcpy(*msg,"Element at index is not primitive\n");
-                          return NULL;
-                        }
-                        else{
-                          typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                          temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
-                          strcpy(temp_->name, "non_terminal");
-                          temp_->type = primitive;
-                          temp_->next = NULL;
-                          temp_->exp = (expression*)malloc(sizeof(expression));
-                          temp_->exp->a = (prim*)malloc(sizeof(prim));
-                          temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
-                          strcpy(temp_->exp->a->basicElementType, "INTEGER");
-                          return temp_;
-                        }
+                        strcpy(*msg,"Invalid number of dimensions\n");
+                        return NULL;
+                    }
+                    if(!flag){
+                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                      temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
+                      strcpy(temp_->name, "non_terminal");
+                      temp_->type = primitive;
+                      temp_->next = NULL;
+                      temp_->exp = (expression*)malloc(sizeof(expression));
+                      temp_->exp->a = (prim*)malloc(sizeof(prim));
+                      temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
+                      strcpy(temp_->exp->a->basicElementType, "INTEGER");
+                      return temp_;
                     }
                     jagged* dim_details = temp->exp->c;
                     int dimensions = temp->exp->c->dimensions;
@@ -502,7 +500,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     // printf("%d\n",numNums);
                     if(temp->array_type == dyn){
                       if (numNums != temp->exp->b->dimensions){
-                          strcpy(*msg,"Element at index is not primitive\n");
+                          strcpy(*msg,"Invalid number of dimensions\n");
                           return NULL;
                       }
                       else{
@@ -518,23 +516,22 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                         return temp_;
                       }
                     }
+
                     if (numNums != temp->exp->c->dimensions){
-                        if(flag){
-                          strcpy(*msg,"Element at index is not primitive\n");
-                          return NULL;
-                        }
-                        else{
-                          typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                          temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
-                          strcpy(temp_->name, "non_terminal");
-                          temp_->type = primitive;
-                          temp_->next = NULL;
-                          temp_->exp = (expression*)malloc(sizeof(expression));
-                          temp_->exp->a = (prim*)malloc(sizeof(prim));
-                          temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
-                          strcpy(temp_->exp->a->basicElementType, "INTEGER");
-                          return temp_;
-                        }
+                        strcpy(*msg,"Invalid number of dimensions\n");
+                        return NULL;
+                    }
+                    if(!flag){
+                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                      temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
+                      strcpy(temp_->name, "non_terminal");
+                      temp_->type = primitive;
+                      temp_->next = NULL;
+                      temp_->exp = (expression*)malloc(sizeof(expression));
+                      temp_->exp->a = (prim*)malloc(sizeof(prim));
+                      temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
+                      strcpy(temp_->exp->a->basicElementType, "INTEGER");
+                      return temp_;
                     }
                     rect_dimension* temp_rect = temp->exp->b->d;
                     int dimension = 1;
@@ -605,7 +602,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               if (temp->type == jagged_array){
                 if(temp->array_type == dyn){
                   if (numNums != temp->exp->b->dimensions){
-                      strcpy(*msg,"Element at index is not primitive\n");
+                      strcpy(*msg,"Invalid number of dimensions\n");
                       return NULL;
                   }
                   else{
@@ -622,22 +619,20 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   }
                 }
                 if (numNums != temp->exp->c->dimensions){
-                    if(flag){
-                      strcpy(*msg,"Element at index is not primitive\n");
-                      return NULL;
-                    }
-                    else{
-                      typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
-                      temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
-                      strcpy(temp_->name, "non_terminal");
-                      temp_->type = primitive;
-                      temp_->next = NULL;
-                      temp_->exp = (expression*)malloc(sizeof(expression));
-                      temp_->exp->a = (prim*)malloc(sizeof(prim));
-                      temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
-                      strcpy(temp_->exp->a->basicElementType, "INTEGER");
-                      return temp_;
-                    }
+                    strcpy(*msg,"Invalid number of dimensions\n");
+                    return NULL;
+                }
+                if(!flag){
+                  typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                  temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
+                  strcpy(temp_->name, "non_terminal");
+                  temp_->type = primitive;
+                  temp_->next = NULL;
+                  temp_->exp = (expression*)malloc(sizeof(expression));
+                  temp_->exp->a = (prim*)malloc(sizeof(prim));
+                  temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
+                  strcpy(temp_->exp->a->basicElementType, "INTEGER");
+                  return temp_;
                 }
                   jagged* dim_details = temp->exp->c;
                   int dimensions = temp->exp->c->dimensions;
@@ -725,7 +720,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               else if (temp->type == rect_array){
                 if(temp->array_type == dyn){
                   if (numNums != temp->exp->c->dimensions){
-                      strcpy(*msg,"Element at index is not primitive\n");
+                      strcpy(*msg,"Invalid number of dimensions\n");
                       return NULL;
                   }
                   else{
@@ -742,8 +737,20 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   }
                 }
                 if (numNums != temp->exp->c->dimensions){
-                    strcpy(*msg,"Element at index is not primitive\n");
+                    strcpy(*msg,"Invalid number of dimensions\n");
                     return NULL;
+                }
+                if(!flag){
+                  typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
+                  temp_->name = (char*)malloc(sizeof(char) * strlen("non_terminal"));
+                  strcpy(temp_->name, "non_terminal");
+                  temp_->type = primitive;
+                  temp_->next = NULL;
+                  temp_->exp = (expression*)malloc(sizeof(expression));
+                  temp_->exp->a = (prim*)malloc(sizeof(prim));
+                  temp_->exp->a->basicElementType = (char*)malloc(sizeof(char) * strlen("INTEGER"));
+                  strcpy(temp_->exp->a->basicElementType, "INTEGER");
+                  return temp_;
                 }
                   rect_dimension* temp_rect = temp->exp->b->d;
                   int dimension = 1;
