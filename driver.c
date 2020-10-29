@@ -19,7 +19,12 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     char* SOURCE_CODE_FILE_PATH = argv[1];
-
+    FILE* fp = fopen(argv[1], "r");
+    if (fp == NULL){
+        printf("Input File Not Found!\n");
+        return 0;
+    }
+    fclose(fp);
     grammarNode* Grammar[NUMBER_OF_GRAMMAR_RULES];
     tokenStream* TokenStreamPointer = NULL;
     parseTree* ParseTree = NULL;
