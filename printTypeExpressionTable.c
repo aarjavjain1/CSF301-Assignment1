@@ -7,23 +7,23 @@
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable *T){
-    printf ("Inside printTypeExpressionTable.\n");
-    printf("Field1\t\tField2\t\tField3\t\tField4\n");
+    // printf ("Inside printTypeExpressionTable.\n");
+    // printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
     // while(l){
-        printf("%s\t", l->name);
-        if (l->type == primitive)
-            printf("Primitive\t");
-        else if (l->type == rect_array)
-            printf("Rectangular Array\t");
-        else if (l->type == jagged_array)
-            printf("Jagged Array\t");
-        if (l->array_type == stat)
-            printf("Static\t");
-        else if (l->array_type == dyn)
-            printf("Dynamic\t");
-        else if (l->array_type == NA)
-            printf("Not Applicable\t");
+        // printf("%s\t", l->name);
+        // if (l->type == primitive)
+        //     printf("Primitive\t");
+        // else if (l->type == rect_array)
+        //     printf("Rectangular Array\t");
+        // else if (l->type == jagged_array)
+        //     printf("Jagged Array\t");
+        // if (l->array_type == stat)
+        //     printf("Static\t");
+        // else if (l->array_type == dyn)
+        //     printf("Dynamic\t");
+        // else if (l->array_type == NA)
+        //     printf("Not Applicable\t");
         if (l->type == primitive){
             printf("<type = %s>", l->exp->a->basicElementType);
         }
@@ -60,6 +60,6 @@ int printTypeExpressionTable (typeExpressionTable *T){
             }
             printf("), basicElementType=INTEGER>");
         }
-        printf("\n");
+        // printf("\n");
     return 0;
 }
