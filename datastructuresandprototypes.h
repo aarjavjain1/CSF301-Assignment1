@@ -48,7 +48,7 @@ This file contains datastructures and function prototypes necessary for implemen
         int grammarRuleNum;
         struct grammarOrderNodeStruct *next;
     }grammarOrderNode;
-    
+
     // Type Expression Table DS
 
     typedef enum {primitive, rect_array, jagged_array} Type;
@@ -189,7 +189,7 @@ int printParseTreeWithDepth (parseTree *t, int currentDepth);
 ////// Utility functions for traverseParseTree
 void recurse(parseTree *t);
 void addDeclaration(parseTree** t, typeExpressionTable **T);
-typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table);
+typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table, char** msg);
 void addAssignment(parseTree** t, typeExpressionTable *T);
 int compare(typeExpressionTable* a, typeExpressionTable* b, int op);
 int max(int a, int b);
