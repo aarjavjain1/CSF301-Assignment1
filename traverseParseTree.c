@@ -356,9 +356,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 }
                 if(temp == NULL){
                     if(input->children[0]->lexeme)
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
                     else
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 return temp;
@@ -381,9 +381,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 }
                 if(temp == NULL){
                     if(input->children[0]->lexeme)
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
                     else
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 if (temp->type == jagged_array){
@@ -590,9 +590,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               }
               if(temp == NULL){
                   if(input->children[0]->lexeme)
-                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
                   else
-                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
                   return NULL;
               }
               return temp;
@@ -616,9 +616,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               }
               if(temp == NULL){
                   if(input->children[0]->lexeme)
-                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
                   else
-                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
                   return NULL;
               }
               if (temp->type == jagged_array){
@@ -813,9 +813,9 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 }
                 if(temp == NULL){
                     if(input->children[0]->lexeme)
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
                     else
-                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 return temp;
