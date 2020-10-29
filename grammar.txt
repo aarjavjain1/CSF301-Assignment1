@@ -30,6 +30,10 @@ value_list_3 -> mini_value_list_3 SEMICOLON value_list_3
 value_list_3 -> mini_value_list_3
 mini_value_list_3 -> NUMBER mini_value_list_3
 mini_value_list_3 -> NUMBER
+new_value_list_3 -> VAR new_value_list_3
+new_value_list_3 -> VAR
+new_value_list_3 -> NUMBER new_value_list_3
+new_value_list_3 -> NUMBER
 assignment -> lhs EQUALS expression SEMICOLON
 expression -> and_expression OP_OR expression
 expression -> and_expression
@@ -40,8 +44,10 @@ arith_expression -> term
 term -> factor op_mult_div term
 term -> factor
 factor -> VAR LSQUARE mini_value_list_3 RSQUARE
+factor -> VAR LSQUARE new_value_list_3 RSQUARE
 factor -> id
 lhs -> VAR LSQUARE mini_value_list_3 RSQUARE
+lhs -> VAR LSQUARE new_value_list_3 RSQUARE
 lhs -> VAR
 op_plus_minus -> OP_PLUS
 op_plus_minus -> OP_MINUS

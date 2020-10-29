@@ -40,7 +40,7 @@ void addDeclaration(parseTree** t, typeExpressionTable **T){
     // for (int i = 0; i < parseIndex; i++) {
     //     printf("%s ", parseArray[i]->symbolName);
     // }
-    printf("\n");
+    // printf("\n");
     int low_var = 200000000, high_var = -200000000, colon = -1;
     for (int i = 0; i < parseIndex; i++) {
         // printf("%s ", parseArray[i]->symbolName);
@@ -669,8 +669,7 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
                 (*t)->type = (*t)->children[0]->type;
             } else {
                 (*t)->type = NULL;
-                printf("Type Error\
-                        Line Number: %d\
+                printf("Type Expression Error Line Number: %d\
                         Statement Type: Assignment\
                         Operator\
                         First Lexeme\n", (*t)->lineNumber);
