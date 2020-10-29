@@ -970,9 +970,9 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
-                printTypeExpressionTable((*t)->children[0]->type);
+                printTypeExpression((*t)->children[0]->type);
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
-                printTypeExpressionTable((*t)->children[2]->type);
+                printTypeExpression((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: Boolean Operation Type Mismatch\n\n");
                 // printf("Error aa gayi 1 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
@@ -982,14 +982,14 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = (*t)->children[0]->type;
             } else {
                 (*t)->type = NULL;
-                // printTypeExpressionTable((*t)->children[0]->type);
-                // printTypeExpressionTable((*t)->children[2]->type);
+                // printTypeExpression((*t)->children[0]->type);
+                // printTypeExpression((*t)->children[2]->type);
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
-                printTypeExpressionTable((*t)->children[0]->type);
+                printTypeExpression((*t)->children[0]->type);
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
-                printTypeExpressionTable((*t)->children[2]->type);
+                printTypeExpression((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS"))
                     printf(", Message: Addition Operation Type Mismatch\n\n");
@@ -1017,9 +1017,9 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
-                printTypeExpressionTable((*t)->children[0]->type);
+                printTypeExpression((*t)->children[0]->type);
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
-                printTypeExpressionTable((*t)->children[2]->type);
+                printTypeExpression((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: Division Operation Type Mismatch\n\n");
             }
@@ -1028,14 +1028,14 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = (*t)->children[0]->type;
             else {
                 (*t)->type = NULL;
-                // printTypeExpressionTable((*t)->children[0]->type);
-                // printTypeExpressionTable((*t)->children[2]->type);
+                // printTypeExpression((*t)->children[0]->type);
+                // printTypeExpression((*t)->children[2]->type);
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
-                printTypeExpressionTable((*t)->children[0]->type);
+                printTypeExpression((*t)->children[0]->type);
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
-                printTypeExpressionTable((*t)->children[2]->type);
+                printTypeExpression((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: Assignment Type Mismatch\n\n");
             }

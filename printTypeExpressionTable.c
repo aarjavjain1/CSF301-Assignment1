@@ -14,7 +14,7 @@ Group Member details:
 #include "datastructuresandprototypes.h"
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
-int printTypeExpressionTable (typeExpressionTable *T){
+void printTypeExpression (typeExpressionTable *T){
     // printf ("Inside printTypeExpressionTable.\n");
     // printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
@@ -67,5 +67,29 @@ int printTypeExpressionTable (typeExpressionTable *T){
         }
     }
         // printf("\n");
-    return 0;
+    return;
+}
+
+void printTypeExpressionTable(typeExpressionTable* T){
+    typeExpressionTable* l = T;
+    printf("Field1\t\tField2\t\tField3\t\tField4\n");
+    while(l){
+        printf("%s\t", l->name);
+        if (l->type == primitive)
+            printf("Primitive\t");
+        else if (l->type == rect_array)
+            printf("Rectangular Array\t");
+        else if (l->type == jagged_array)
+            printf("Jagged Array\t");
+        if (l->array_type == stat)
+            printf("Static\t");
+        else if (l->array_type == dyn)
+            printf("Dynamic\t");
+        else if (l->array_type == NA)
+            printf("Not Applicable\t");
+        printTypeExpression(l);
+        printf("\n");
+        l = l->next;
+    }
+    return;
 }
