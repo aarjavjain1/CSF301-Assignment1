@@ -16,11 +16,15 @@ Group Member details:
 // parseTree* parseArray[MAX_VARIABLES];
 // static int parseIndex = 0;
 
-int max(int a, int b) {
-    if (a > b)
-        return a;
-    else
-        return b;
+int getLineNumber(parseTree *t){
+    parseTree* temp = t;
+    while(temp && temp->children[0]) temp = temp->children[0];
+    return temp->lineNumber;
+}
+
+int max(int a, int b){
+    if (a > b) return a;
+    else return b;
 }
 
 int min(int a, int b) {
@@ -184,9 +188,25 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                     continue;
                 } else {
                     jagged_dimension* jd = (jagged_dimension*)malloc(sizeof(jagged_dimension));
-                    jd->parent = atoi(parseArray[colon + 2]->lexeme);
-                    if (jd->parent < low || jd->parent > high) {
-                        printf("Jagged Array Index out of Bounds\n");
+                    jd->parent = atoi(parseArray[colon+2]->lexeme);
+                    if (jd->parent < low) {
+                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Variables:");
+                        for(int z = low_var; z <= high_var; z++){
+                            printf(" %s", parseArray[z]->lexeme);
+                        }
+                        printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                        printf(", Message: %d is lesser than %d, lower dimension of dimension 2\n\n", jd->parent, low); 
+                        return;
+                    }
+                    if (jd->parent > high) {
+                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Variables:");
+                        for(int z = low_var; z <= high_var; z++){
+                            printf(" %s", parseArray[z]->lexeme);
+                        }
+                        printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                        printf(", Message: %d is higher than %d, higher dimension of dimension 2\n\n", jd->parent, high); 
                         return;
                     }
                     jd->size = atoi(parseArray[colon + 6]->lexeme);
@@ -194,16 +214,31 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                     jd->next = NULL;
                     int loop = jd->size;
                     colon += 10;
-                    if (dim == 2) {
-                        while (--loop) {
-                            if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon + 1]->symbolName, "SEMICOLON")) {
-                                printf("Type Error Occurred\n");
+                    if (dim == 2){
+                        while(--loop){
+                            if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "SEMICOLON")) {
+                                printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                printf("Variables:");
+                                for(int z = low_var; z <= high_var; z++){
+                                    printf(" %s", parseArray[z]->lexeme);
+                                }
+                                printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                                if (!strcmp(parseArray[colon+1]->symbolName, "RCURLY"))
+                                    printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n");
+                                else
+                                    printf(", Message: Invaild 2 dimensional declaration, only one element allowed\n\n");
                                 return;
                             }
                             colon += 2;
                         }
-                        if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon + 1]->symbolName, "RCURLY")) {
-                            printf("Type Error Occurred\n");
+                        if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "RCURLY")) {
+                            printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                            printf("Variables:");
+                            for(int z = low_var; z <= high_var; z++){
+                                printf(" %s", parseArray[z]->lexeme);
+                            }
+                        printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                        printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n");
                             return;
                         }
                         jd->inner_size = NULL;
@@ -212,13 +247,25 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             int inner_size = 0;
                             for (; strcmp(parseArray[colon]->symbolName, "SEMICOLON"); colon++) {
                                 if (!strcmp(parseArray[colon]->symbolName, "RCURLY")) {
-                                    printf("Type Error Occurred123\n");
+                                    printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                    printf("Variables:");
+                                    for(int z = low_var; z <= high_var; z++){
+                                        printf(" %s", parseArray[z]->lexeme);
+                                    }
+                                    printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                                    printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n"); 
                                     return;
                                 }
                                 if (!strcmp(parseArray[colon]->symbolName, "NUMBER"))
                                     inner_size++;
                                 else {
-                                    printf("Type Error Occurred456\n");
+                                    printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                    printf("Variables:");
+                                    for(int z = low_var; z <= high_var; z++){
+                                        printf(" %s", parseArray[z]->lexeme);
+                                    }
+                                    printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                                    printf(", Message: Invalid 3D declaration\n\n");
                                     return;
                                 }
                             }
@@ -239,7 +286,13 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             if (!strcmp(parseArray[colon]->symbolName, "NUMBER"))
                                 inner_size++;
                             else {
-                                printf("Type Error Occurred789\n");
+                                printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                printf("Variables:");
+                                for(int z = low_var; z <= high_var; z++){
+                                    printf(" %s", parseArray[z]->lexeme);
+                                }
+                                printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                                printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n");
                                 return;
                             }
                         }
@@ -253,8 +306,16 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             while (l->next) l = l->next;
                             l->next = d;
                         }
-                    } else {
-                        printf("Jagged Array Dimension out of range\n");
+                    }
+                    else {
+                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Variables:");
+                        for(int z = low_var; z <= high_var; z++){
+                            printf(" %s", parseArray[z]->lexeme);
+                        }
+                        printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+                        printf(", Message: Jagged Array out of bounds\n\n");
+                        return;
                     }
                     if (temp->exp->c->d == NULL)
                         temp->exp->c->d = jd;
@@ -274,20 +335,13 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                 l->next = temp;
             }
         }
-    } else {
-        printf("Traversal Error Occured\n");
     }
-
-    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
-    //     if (t->children[i])
-    //         printf("%s\t", t->children[i]->symbolName);
-    // }
-    // printf("\n");
-    // for (int i = 0; i< MAX_PARSE_TREE_CHILDREN; i++){
-    //     if (t->children[i])
-    //         printParseTree(t->children[i]);
-    // }
-    // printf("\n");.
+    else {
+        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+        printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
+        printf(", Message: Traversal Error Occurred\n\n");
+        return;
+    }
     return;
 }
 
@@ -848,18 +902,15 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = (*t)->children[0]->type;
             } else {
                 (*t)->type = NULL;
-                printf(
-                    "Type Expression Error Line Number: %d\
-                        Statement Type: Assignment\
-                        Operator\
-                        First Lexeme\n",
-                    (*t)->lineNumber);
+                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Operator: %3s, ", (*t)->children[1]->lexeme);
+                printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpressionTable((*t)->children[0]->type);
-                printf(
-                    "Second Lexeme\
-                        Second Type: ");
+                printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
-                printf("Error aa gayi 1 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+                printf(", Depth in Parse Tree: %d", (*t)->depth);
+                printf(", Message: Boolean Operation Type Mismatch\n\n"); 
+                // printf("Error aa gayi 1 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
             }
         } else if (op == 2) {
             if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)) {
@@ -868,19 +919,19 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = NULL;
                 // printTypeExpressionTable((*t)->children[0]->type);
                 // printTypeExpressionTable((*t)->children[2]->type);
-                printf(
-                    "Type Error\
-                        Line Number: %d\
-                        Statement Type: Assignment\
-                        Operator\
-                        First Lexeme\n",
-                    (*t)->lineNumber);
+                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
+                printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpressionTable((*t)->children[0]->type);
-                printf(
-                    "Second Lexeme\
-                        Second Type: ");
+                printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
-                printf("Error aa gayi 2 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+                printf(", Depth in Parse Tree: %d", (*t)->depth);
+                if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_PLUS"))
+                    printf(", Message: Addition Operation Type Mismatch\n\n");
+                else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_MINUS"))
+                    printf(", Message: Subtraction Operation Type Mismatch\n\n");
+                else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_MULT"))
+                    printf(", Message: Multiplication Operation Type Mismatch\n\n");
             }
         } else if (op == 3) {
             if (compare((*t)->children[0]->type, (*t)->children[2]->type, op)) {
@@ -897,19 +948,15 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = temp;
             } else {
                 (*t)->type = NULL;
-                printf(
-                    "Type Error\
-                        Line Number: %d\
-                        Statement Type: Assignment\
-                        Operator\
-                        First Lexeme\n",
-                    (*t)->lineNumber);
+                
+                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
+                printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpressionTable((*t)->children[0]->type);
-                printf(
-                    "Second Lexeme\
-                        Second Type: ");
+                printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
-                printf("Error aa gayi 3 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+                printf(", Depth in Parse Tree: %d", (*t)->depth);
+                printf(", Message: Division Operation Type Mismatch\n\n"); 
             }
         } else if (op == 4) {
             if (compare((*t)->children[0]->type, (*t)->children[2]->type, 1) || compare((*t)->children[0]->type, (*t)->children[2]->type, 2))
@@ -918,19 +965,14 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = NULL;
                 // printTypeExpressionTable((*t)->children[0]->type);
                 // printTypeExpressionTable((*t)->children[2]->type);
-                printf(
-                    "Type Error\
-                        Line Number: %d\
-                        Statement Type: Assignment\
-                        Operator\
-                        First Lexeme\n",
-                    (*t)->lineNumber);
+                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Operator: %3s, ", (*t)->children[1]->lexeme);
+                printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpressionTable((*t)->children[0]->type);
-                printf(
-                    "Second Lexeme\
-                        Second Type: ");
+                printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
-                printf("Error aa gayi 4 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+                printf(", Depth in Parse Tree: %d", (*t)->depth);
+                printf(", Message: Assignment Type Mismatch\n\n"); 
             }
         }
     }
@@ -952,10 +994,4 @@ int traverseParseTree(parseTree** t, typeExpressionTable** T) {
             traverseParseTree(&((*t)->children[i]), T);
     }
     return 0;
-}
-
-int getLineNumber(parseTree* t) {
-    parseTree* temp = t;
-    while (temp && temp->children[0]) temp = temp->children[0];
-    return temp->lineNumber;
 }

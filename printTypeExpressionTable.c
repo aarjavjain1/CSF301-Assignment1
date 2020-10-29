@@ -14,31 +14,32 @@ Group Member details:
 #include "datastructuresandprototypes.h"
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
-int printTypeExpressionTable(typeExpressionTable* T) {
-    printf("Inside printTypeExpressionTable.\n");
-    printf("Field1\t\tField2\t\tField3\t\tField4\n");
+int printTypeExpressionTable (typeExpressionTable *T){
+    // printf ("Inside printTypeExpressionTable.\n");
+    // printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
     // while(l){
-    printf("%s\t", l->name);
-    if (l->type == primitive)
-        printf("Primitive\t");
-    else if (l->type == rect_array)
-        printf("Rectangular Array\t");
-    else if (l->type == jagged_array)
-        printf("Jagged Array\t");
-    if (l->array_type == stat)
-        printf("Static\t");
-    else if (l->array_type == dyn)
-        printf("Dynamic\t");
-    else if (l->array_type == NA)
-        printf("Not Applicable\t");
-    if (l->type == primitive) {
+        // printf("%s\t", l->name);
+        // if (l->type == primitive)
+        //     printf("Primitive\t");
+        // else if (l->type == rect_array)
+        //     printf("Rectangular Array\t");
+        // else if (l->type == jagged_array)
+        //     printf("Jagged Array\t");
+        // if (l->array_type == stat)
+        //     printf("Static\t");
+        // else if (l->array_type == dyn)
+        //     printf("Dynamic\t");
+        // else if (l->array_type == NA)
+        //     printf("Not Applicable\t");
+    if (l->type == primitive){
         printf("<type = %s>", l->exp->a->basicElementType);
-    } else if (l->type == rect_array) {
+    }
+    else if (l->type == rect_array){
         printf("<type=rectangularArray, dimensions=%d, ", l->exp->b->dimensions);
         rect_dimension* temp = l->exp->b->d;
         int count = 0;
-        while (temp) {
+        while(temp){
             count++;
             printf("range_R%d=(%s,%s), ", count, temp->low, temp->high);
             temp = temp->next;
@@ -64,8 +65,7 @@ int printTypeExpressionTable(typeExpressionTable* T) {
             if (temp->next) printf(",");
             temp = temp->next;
         }
-        printf("), basicElementType=INTEGER>");
     }
-    printf("\n");
+        // printf("\n");
     return 0;
 }
