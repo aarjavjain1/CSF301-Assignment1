@@ -14,14 +14,12 @@ Group Member details:
 #define SOURCE_CODE_FILE_PATH "sourcecode.txt"
 
 int main(int argc, char* argv[]) {
-    // TODO
-    // Argument checking and parsing goes here
-
-    // Data Structures initialisation
     grammarNode* Grammar[NUMBER_OF_GRAMMAR_RULES];
     tokenStream* TokenStreamPointer = NULL;
     parseTree* ParseTree = NULL;
     typeExpressionTable* TypeExpressionTable = NULL;
+    readGrammar(GRAMMAR_FILE_PATH, Grammar);
+    TokenStreamPointer = tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
     // Menu
     int menu_choice = 0;
     do {
@@ -40,46 +38,37 @@ int main(int argc, char* argv[]) {
             break;
         }
         case 1: {
-            // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
-            readGrammar(GRAMMAR_FILE_PATH, Grammar);
-            TokenStreamPointer = tokeniseSourcecode(SOURCE_CODE_FILE_PATH, TokenStreamPointer);
-            tokenStream* test = TokenStreamPointer;
-            // while(test != NULL){
-            // printf("%s\n",test->tokenName );
-            // test = test->next;
-            // }
-            printf("tokenised\n");
-            // for (int i = 0; i<NUMBER_OF_GRAMMAR_RULES; i++){
-            //     printf("%d", i);print_grammar_rule(Grammar[i]);
-            // }
-            ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
-
-            printf("Parse tree creation works\n\n");
-            traverseParseTree(&ParseTree, &TypeExpressionTable);
-            // printTypeExpressionTable(TypeExpressionTable);
-
-            // printf ("Parse tree traversal: In Progress\n\n");
+            if (ParseTree == NULL){
+                ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                printf("Parse Tree Created\n");
+            }
+            else
+                printf("Parse Tree already exists!");
             break;
         }
         case 2: {
-            // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
-            // traverseParseTree(ParseTree, TypeExpressionTable);
-
-            printf("Parse tree traversal: yet to be implemented\n\n");
+            if (TypeExpressionTable == NULL){
+                traverseParseTree(&ParseTree, &TypeExpressionTable);
+                printf("Traversal Complete\n");
+            }
+            else
+                printf("Type Expression Table already exists!");
             break;
         }
         case 3: {
-            // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
-            printParseTree(ParseTree);
-
-            printf("Parse tree printing: yet to be implemented\n\n");
+            if (ParseTree == NULL){
+                printf("Parse Tree does not exist. Please create it first!\n");
+            }
+            else
+                printParseTree(ParseTree);
             break;
         }
         case 4: {
-            // The variables used as actual parameters here have been declared above the do while menu loop, inside the main function
-            printTypeExpressionTable(TypeExpressionTable);
-
-            printf("typeExpressionTable printing: yet to be implemented\n\n");
+            if (TypeExpressionTable == NULL){
+                printf("Type Expression Table does not exist. Please create it first!\n");
+            }
+            else
+                printTypeExpressionTable(TypeExpressionTable);
             break;
         }
         default: {

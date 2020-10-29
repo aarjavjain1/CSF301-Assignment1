@@ -877,8 +877,8 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
             printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
             printf(", Depth in Parse Tree: %d", (*t)->depth);
             printf(", Message: %s\n\n", buffer);
-        }
-        addAssignment(&(*t)->children[2], T);
+        } else
+            addAssignment(&(*t)->children[2], T);
         op = 4;
         //compare
     } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
@@ -911,14 +911,14 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         } else {
             addAssignment(&(*t)->children[0], T);
         }
-        if (!strcmp((*t)->children[2]->symbolName, "factor")) {
+        if ((*t)->children[0]->type && !strcmp((*t)->children[2]->symbolName, "factor")) {
             (*t)->children[2]->type = getExpression((*t)->children[2], T, &buffer);
             if ((*t)->children[2]->type == NULL) {
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: %s\n\n", buffer);
             }
-        } else {
+        } else if ((*t)->children[0]->type){
             addAssignment(&(*t)->children[2], T);
         }
     }
