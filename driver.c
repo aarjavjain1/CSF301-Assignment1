@@ -54,6 +54,10 @@ int main(int argc, char* argv[]) {
         }
         case 2: {
             if (TypeExpressionTable == NULL){
+                if (ParseTree == NULL){
+                    ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                    // printf("Parse Tree Created\n");
+                }
                 traverseParseTree(&ParseTree, &TypeExpressionTable);
                 printf("Traversal Complete\n");
             }
@@ -63,18 +67,22 @@ int main(int argc, char* argv[]) {
         }
         case 3: {
             if (ParseTree == NULL){
-                printf("Parse Tree does not exist. Please create it first!\n");
+                printf("Parse Tree does not exist. Generating it!\n");
+                ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
             }
-            else
-                printParseTree(ParseTree);
+            printParseTree(ParseTree);
             break;
         }
         case 4: {
             if (TypeExpressionTable == NULL){
-                printf("Type Expression Table does not exist. Please create it first!\n");
+                if (ParseTree == NULL){
+                    ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                    // printf("Parse Tree Created\n");
+                }
+                traverseParseTree(&ParseTree, &TypeExpressionTable);
+                printf("Traversal Complete\n");
             }
-            else
-                printTypeExpressionTable(TypeExpressionTable);
+            printTypeExpressionTable(TypeExpressionTable);
             break;
         }
         default: {

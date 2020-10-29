@@ -14,7 +14,7 @@ Group Member details:
 #include "datastructuresandprototypes.h"
 
 int readGrammar(char* grammarFilePath, grammarNode** G) {
-    printf("Inside readGrammar.\n");
+    // printf("Inside readGrammar.\n");
     FILE* fp;
     char* token;
     fp = fopen(grammarFilePath, "r");

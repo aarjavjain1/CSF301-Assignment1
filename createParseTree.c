@@ -83,7 +83,7 @@ parseTree* parseTreeGetCurrent(parseTree* t) {
 
 void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi) {
     if (current == NULL)
-        printf("populateChildren Got null current with rule: %s", Gi->grammarWord);
+        // printf("populateChildren Got null current with rule: %s", Gi->grammarWord);
     int childToPopulate = 0;
     while (Gi->next != NULL) {
         Gi = Gi->next;
@@ -225,13 +225,13 @@ parseTree* createParseTree(parseTree* t, tokenStream* s, grammarNode** G) {
                 }
             }
             if (!ruleSelectedFlag) {
-                printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
+                // printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
                 printf("No rule Selected, Some error present\n");
                 return NULL;
             }
         } else {
-            printf("Terminal at top of stack, but doesn't match, some problem exists\n");
-            printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
+            // printf("Terminal at top of stack, but doesn't match, some problem exists\n");
+            // printf("st ka top: %s, token: %s\n", st->str, currentToken->tokenName);
             return NULL;
         }
     }
