@@ -4,11 +4,11 @@ all: compile_all
 
 debug: debug_all
 
-debug_all: driver.c datastructuresandprototypes.h readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
-	gcc -g -o compiler driver.c readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
+debug_all: driver.c datastructuresandprototypes.h readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
+	gcc -g -o compiler driver.c readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
 	
-compile_all: driver.c datastructuresandprototypes.h readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
-	gcc -o compiler driver.c readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
+compile_all: driver.c datastructuresandprototypes.h readGrammar.c tokeniseSourcecode.c createParseTree.c printParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
+	gcc -o compiler driver.c readGrammar.c tokeniseSourcecode.c createParseTree.c traverseParseTree.c printParseTree.c printTypeExpressionTable.c freeUtilities.c
 
 
 
