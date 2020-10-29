@@ -190,7 +190,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                     jagged_dimension* jd = (jagged_dimension*)malloc(sizeof(jagged_dimension));
                     jd->parent = atoi(parseArray[colon+2]->lexeme);
                     if (jd->parent < low) {
-                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                         printf("Variables:");
                         for(int z = low_var; z <= high_var; z++){
                             printf(" %s", parseArray[z]->lexeme);
@@ -200,7 +200,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                         return;
                     }
                     if (jd->parent > high) {
-                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                         printf("Variables:");
                         for(int z = low_var; z <= high_var; z++){
                             printf(" %s", parseArray[z]->lexeme);
@@ -217,7 +217,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                     if (dim == 2){
                         while(--loop){
                             if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "SEMICOLON")) {
-                                printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                                 printf("Variables:");
                                 for(int z = low_var; z <= high_var; z++){
                                     printf(" %s", parseArray[z]->lexeme);
@@ -232,7 +232,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             colon += 2;
                         }
                         if (strcmp(parseArray[colon]->symbolName, "NUMBER") || strcmp(parseArray[colon+1]->symbolName, "RCURLY")) {
-                            printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                            printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                             printf("Variables:");
                             for(int z = low_var; z <= high_var; z++){
                                 printf(" %s", parseArray[z]->lexeme);
@@ -247,7 +247,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             int inner_size = 0;
                             for (; strcmp(parseArray[colon]->symbolName, "SEMICOLON"); colon++) {
                                 if (!strcmp(parseArray[colon]->symbolName, "RCURLY")) {
-                                    printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                    printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                                     printf("Variables:");
                                     for(int z = low_var; z <= high_var; z++){
                                         printf(" %s", parseArray[z]->lexeme);
@@ -259,7 +259,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                                 if (!strcmp(parseArray[colon]->symbolName, "NUMBER"))
                                     inner_size++;
                                 else {
-                                    printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                    printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                                     printf("Variables:");
                                     for(int z = low_var; z <= high_var; z++){
                                         printf(" %s", parseArray[z]->lexeme);
@@ -286,7 +286,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             if (!strcmp(parseArray[colon]->symbolName, "NUMBER"))
                                 inner_size++;
                             else {
-                                printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                                printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                                 printf("Variables:");
                                 for(int z = low_var; z <= high_var; z++){
                                     printf(" %s", parseArray[z]->lexeme);
@@ -308,7 +308,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                         }
                     }
                     else {
-                        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+                        printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
                         printf("Variables:");
                         for(int z = low_var; z <= high_var; z++){
                             printf(" %s", parseArray[z]->lexeme);
@@ -337,7 +337,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
         }
     }
     else {
-        printf("\nType Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
+        printf("Type Expression Error, Line Number: %3d, Statement Type: Declaration, ", getLineNumber(*t));
         printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
         printf(", Message: Traversal Error Occurred\n\n");
         return;
@@ -909,7 +909,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
     if (!strcmp((*t)->symbolName, "assignment")) {
         (*t)->children[0]->type = getExpression((*t)->children[0], T, &buffer);
         if ((*t)->children[0]->type == NULL) {
-            printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+            printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
             printf(", Depth in Parse Tree: %d", (*t)->depth);
             printf(", Message: %s\n\n", buffer);
         } else
@@ -919,7 +919,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
     } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
         (*t)->type = getExpression(*t, T, &buffer);
         if ((*t)->type == NULL) {
-            printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+            printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
             printf(", Depth in Parse Tree: %d", (*t)->depth);
             // printf("")
             printf(", Message: %s\n\n", buffer);
@@ -940,7 +940,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         if (!strcmp((*t)->children[0]->symbolName, "factor")) {
             (*t)->children[0]->type = getExpression((*t)->children[0], T, &buffer);
             if ((*t)->children[0]->type == NULL) {
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: %s\n\n", buffer);
             }
@@ -950,7 +950,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         if ((*t)->children[0]->type && !strcmp((*t)->children[2]->symbolName, "factor")) {
             (*t)->children[2]->type = getExpression((*t)->children[2], T, &buffer);
             if ((*t)->children[2]->type == NULL) {
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
                 printf(", Message: %s\n\n", buffer);
             }
@@ -967,7 +967,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         //     // printf("%s %s %d\n", (ttemp)->symbolName, (ttemp)->lexeme, getLineNumber(ttemp));
         //     if ((!strcmp((ttemp)->symbolName, "factor") && (ttemp)->type == NULL) || (!strcmp((ttemp)->symbolName, "lhs") && (ttemp)->type == NULL)) {
         //         getExpression(ttemp, T, &buffer);
-        //         printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+        //         printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
         //         printf(", Depth in Parse Tree: %d", (*t)->depth);
         //         printf(", Message: %s\n\n", buffer);
         //         break;
@@ -982,7 +982,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = (*t)->children[0]->type;
             } else {
                 (*t)->type = NULL;
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpression((*t)->children[0]->type);
@@ -999,7 +999,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = NULL;
                 // printTypeExpression((*t)->children[0]->type);
                 // printTypeExpression((*t)->children[2]->type);
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpression((*t)->children[0]->type);
@@ -1029,7 +1029,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
             } else {
                 (*t)->type = NULL;
 
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpression((*t)->children[0]->type);
@@ -1045,7 +1045,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = NULL;
                 // printTypeExpression((*t)->children[0]->type);
                 // printTypeExpression((*t)->children[2]->type);
-                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
+                printf("Type Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
                 printTypeExpression((*t)->children[0]->type);
