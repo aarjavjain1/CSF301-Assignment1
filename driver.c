@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
                 printf("Parse Tree Created\n");
             }
             else
-                printf("Parse Tree already exists!");
+                printf("Parse Tree already exists!\n");
             break;
         }
         case 2: {
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
                 printf("Traversal Complete\n");
             }
             else
-                printf("Type Expression Table already exists!");
+                printf("Type Expression Table already exists!\n");
             break;
         }
         case 3: {
