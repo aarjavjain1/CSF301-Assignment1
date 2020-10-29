@@ -630,11 +630,11 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
         addAssignment(&(*t)->children[2], T);
         op = 4;
         //compare
-    } 
+    }
     else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
         (*t)->type = getExpression(*t, T);
         return;
-    } 
+    }
     else {
         if ((*t)->children[1] == NULL){
             addAssignment(&(*t)->children[0], T);
@@ -762,4 +762,10 @@ int traverseParseTree (parseTree **t, typeExpressionTable **T){
             traverseParseTree(&((*t)->children[i]), T);
     }
     return 0;
+}
+
+int getLineNumber(parseTree *t){
+    parseTree* temp = t;
+    while(temp && temp->children[0]) temp = temp->children[0];
+    return temp->lineNumber;
 }
