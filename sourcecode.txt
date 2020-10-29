@@ -37,7 +37,8 @@ program ( )
 	c1 = c2 + c1 ;
 	c2 = a1 /  a2 ;                 
 	c1 = a1 * a2 ;                  
-	h1 = s2 + s3 * u - h2 * h3 ;   	
+	h1 = s2 + s3 * u - h2 * h3 ;   
+	s4 [ u 2 ] = d + e2 ;	
 	u = v + u ;			
 	h1 = s4 - s5 * s6 ;         
 	s1 = s2 + s3 * s1  ;	 	

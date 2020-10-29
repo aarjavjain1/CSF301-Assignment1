@@ -93,6 +93,7 @@ void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi) {
         current->children[childToPopulate]->grammarRuleUsed = NULL;
         current->children[childToPopulate]->lexeme = NULL;
         current->children[childToPopulate]->tokenName = NULL;
+        current->children[childToPopulate]->type = NULL;
         current->children[childToPopulate]->isLeaf = 0;
         current->children[childToPopulate]->symbolName = NULL;
         current->children[childToPopulate]->lineNumber = 0;
@@ -181,6 +182,7 @@ parseTree* createParseTree(parseTree* t, tokenStream* s, grammarNode** G) {
         current->children[i] = NULL;
     current->isTerminal = false;
     current->lexeme = NULL;
+    current->type = NULL;
     current->lineNumber = 0;
     current->symbolName = malloc(sizeof(char) * (strlen("main_program") + 1));
     strcpy(current->symbolName, "main_program");
