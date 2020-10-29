@@ -364,6 +364,21 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 return temp;
             } else if (!strcmp(input->children[1]->symbolName, "LSQUARE")) {
                 //do this
+                typeExpressionTable* temp = table;
+                while (temp && strcmp(temp->name, input->children[0]->lexeme)) {
+                    temp = temp->next;
+                }
+                if(temp == NULL){
+                    if(input->children[0]->lexeme)
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
+                    else
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
+                    return NULL;
+                }
+                if(temp->type == primitive){
+                    snprintf(*msg,200,"Invalid access using dimensions on '%s' of type '%s'\n",temp->name,temp->exp->a->basicElementType);
+                    return NULL;
+                }
                 bool flag = true;
                 int numNums = 0;
                 // while(input->children[2]->children[numNums]!=NULL) numNums++;
@@ -375,7 +390,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     rec = rec->children[1];
                 }
                 rec = input->children[2];
-                typeExpressionTable* temp = table;
+                temp = table;
                 while (temp && strcmp(temp->name, input->children[0]->lexeme)) {
                     temp = temp->next;
                 }
@@ -389,7 +404,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                 if (temp->type == jagged_array){
                   if(temp->array_type == dyn){
                     if (numNums != temp->exp->b->dimensions){
-                        strcpy(*msg,"Invalid number of dimensions\n");
+                        snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->b->dimensions);
                         return NULL;
                     }
                     else{
@@ -406,7 +421,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     }
                   }
                     if (numNums != temp->exp->c->dimensions){
-                        strcpy(*msg,"Invalid number of dimensions\n");
+                        snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->c->dimensions);
                         return NULL;
                     }
                     if(!flag){
@@ -506,7 +521,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     // printf("%d\n",numNums);
                     if(temp->array_type == dyn){
                       if (numNums != temp->exp->b->dimensions){
-                          strcpy(*msg,"Invalid number of dimensions\n");
+                          snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->b->dimensions);
                           return NULL;
                       }
                       else{
@@ -524,7 +539,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     }
 
                     if (numNums != temp->exp->c->dimensions){
-                        strcpy(*msg,"Invalid number of dimensions\n");
+                        snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->c->dimensions);
                         return NULL;
                     }
                     if(!flag){
@@ -599,6 +614,21 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
           }
           else if(!strcmp(input->children[1]->symbolName,"LSQUARE")){
             //do this
+            typeExpressionTable* temp = table;
+            while (temp && strcmp(temp->name, input->children[0]->lexeme)) {
+                temp = temp->next;
+            }
+            if(temp == NULL){
+                if(input->children[0]->lexeme)
+                  snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->lexeme);
+                else
+                  snprintf(*msg,200,"Undeclared or Type Error in Declaration of '%s'\n",input->children[0]->children[0]->lexeme);
+                return NULL;
+            }
+            if(temp->type == primitive){
+                snprintf(*msg,200,"Invalid access using dimensions on '%s' of type '%s'\n",temp->name,temp->exp->a->basicElementType);
+                return NULL;
+            }
               bool flag = true;
               int numNums = 0;
               // while(input->children[2]->children[numNums]!=NULL) numNums++;
@@ -610,7 +640,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   rec = rec->children[1];
               }
               rec = input->children[2];
-              typeExpressionTable* temp = table;
+              temp = table;
               while(temp && strcmp(temp->name,input->children[0]->lexeme)){
                   temp = temp->next;
               }
@@ -624,7 +654,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               if (temp->type == jagged_array){
                 if(temp->array_type == dyn){
                   if (numNums != temp->exp->b->dimensions){
-                      strcpy(*msg,"Invalid number of dimensions\n");
+                      snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->b->dimensions);
                       return NULL;
                   }
                   else{
@@ -641,7 +671,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   }
                 }
                 if (numNums != temp->exp->c->dimensions){
-                    strcpy(*msg,"Invalid number of dimensions\n");
+                    snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->c->dimensions);
                     return NULL;
                 }
                 if(!flag){
@@ -742,7 +772,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
               else if (temp->type == rect_array){
                 if(temp->array_type == dyn){
                   if (numNums != temp->exp->c->dimensions){
-                      strcpy(*msg,"Invalid number of dimensions\n");
+                      snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->c->dimensions);
                       return NULL;
                   }
                   else{
@@ -759,7 +789,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   }
                 }
                 if (numNums != temp->exp->c->dimensions){
-                    strcpy(*msg,"Invalid number of dimensions\n");
+                    snprintf(*msg,200,"Invalid number of dimensions %d for variable '%s' with dimensions %d\n",numNums,temp->name,temp->exp->c->dimensions);
                     return NULL;
                 }
                 if(!flag){
