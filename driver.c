@@ -11,9 +11,14 @@ Group Member details:
 #include "datastructuresandprototypes.h"
 
 #define GRAMMAR_FILE_PATH "grammar.txt"
-#define SOURCE_CODE_FILE_PATH "sourcecode.txt"
 
 int main(int argc, char* argv[]) {
+
+    if (argc != 2){
+        printf ("Usage: ./output testcase.txt\n");
+    }
+    char* SOURCE_CODE_FILE_PATH = argv[1];
+
     grammarNode* Grammar[NUMBER_OF_GRAMMAR_RULES];
     tokenStream* TokenStreamPointer = NULL;
     parseTree* ParseTree = NULL;
