@@ -1,5 +1,11 @@
 /*
-This file contains datastructures and function prototypes necessary for implementation of this compiler.
+Group Number: 55
+Group Member details:
+1. Aarjav Jain -- 2018A7PS0222P
+2. Pranav Gupta -- 2018A7PS0190P
+3. Harsh Sulakhe -- 2018A7PS0186P
+
+This file contains datastructures and function prototypes necessary.
 */
 
 //////////////////////////////DATA STRUCTURES////////////////////////////////////////////
@@ -114,6 +120,7 @@ This file contains datastructures and function prototypes necessary for implemen
         grammarNode* grammarRuleUsed;
         char *symbolName;
         int isLeaf;
+        int depth;
         // child pointer
         struct parseTreeStruct *children[MAX_PARSE_TREE_CHILDREN];
         typeExpressionTable* type;
@@ -161,10 +168,6 @@ void freeGrammarRuleMemory(grammarNode* Gi);
 void freeGrammarMemory(grammarNode** G);
 void freeStackMemory(stack* st);
 
-////// Utility functions for readGrammar
-// trimwhitespace(char* str) is utility for both reagGrammar and tokeniseSourcecode
-
-
 ////// Utility functions for tokeniseSourcecode
 char* trimwhitespace(char *str);
 bool isVariable(char* str);
@@ -172,6 +175,8 @@ bool isNumber(char* str);
 int search(char* token);
 tokenStream* get_token(char* token,int* line_count);
 
+////// Utility functions for readGrammar
+// trimwhitespace(char* str) is utility for both reagGrammar and tokeniseSourcecode
 
 ////// Utility functions for createParseTree
 int isGrammarWordTerminal(char* str);
@@ -182,9 +187,7 @@ stack* stack_pushrhs(stack* root, grammarNode* G);
 parseTree* parseTreeGetCurrent(parseTree* t);
 void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi);
 int predictRule(int grammarRuleNum, grammarNode** G, tokenStream** recievedToken, grammarOrderNode **grammarOrderAddress, parseTree* t);
-
-////// Utilify functions for printParseTree
-int printParseTreeWithDepth (parseTree *t, int currentDepth);
+void populateParseTreeDepth(parseTree* t, int currentDepth);
 
 ////// Utility functions for traverseParseTree
 void recurse(parseTree *t);
@@ -195,5 +198,8 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op);
 int max(int a, int b);
 int min(int a, int b);
 
-////// Utility functions for printParseTree
+////// Utilify functions for printParseTree
+// No utility functions
+
+////// Utility functions for printTypeExpressionTable
 // No utility functions

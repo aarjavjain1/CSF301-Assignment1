@@ -1,41 +1,48 @@
+/*
+Group Number: 55
+Group Member details:
+1. Aarjav Jain -- 2018A7PS0222P
+2. Pranav Gupta -- 2018A7PS0190P
+3. Harsh Sulakhe -- 2018A7PS0186P
+*/
+
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 #include "datastructuresandprototypes.h"
 
-
-void freeParseTreeNodeChildrenAll(parseTree *t){
+void freeParseTreeNodeChildrenAll(parseTree* t) {
     if (t == NULL)
         return;
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
-            freeParseTreeNodeChildrenAll(t->children[i]);
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++) {
+        freeParseTreeNodeChildrenAll(t->children[i]);
     }
     free(t);
 }
 
-void freeParseTreeNodeChildren(parseTree* t){
+void freeParseTreeNodeChildren(parseTree* t) {
     if (t == NULL)
         return;
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++) {
         freeParseTreeNodeChildrenAll(t->children[i]);
     }
     for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
         t->children[i] = NULL;
 }
 
-void freeParseTreeMemory(parseTree *rootOfParseTree){
+void freeParseTreeMemory(parseTree* rootOfParseTree) {
     if (rootOfParseTree == NULL)
         return;
-    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++){
-            freeParseTreeNodeChildrenAll(rootOfParseTree->children[i]);
+    for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++) {
+        freeParseTreeNodeChildrenAll(rootOfParseTree->children[i]);
     }
     free(rootOfParseTree->symbolName);
     free(rootOfParseTree);
 }
 
-void freeRectDimensionMemory(rect_dimension* rd){
+void freeRectDimensionMemory(rect_dimension* rd) {
     if (rd == NULL)
         return;
     if (rd->low)
@@ -46,14 +53,14 @@ void freeRectDimensionMemory(rect_dimension* rd){
     free(rd);
 }
 
-void freeDimensionMemory(dimension* d){
+void freeDimensionMemory(dimension* d) {
     if (d == NULL)
         return;
     freeDimensionMemory(d->next);
     free(d);
 }
 
-void freeJaggedDimensionMemory(jagged_dimension* jd){
+void freeJaggedDimensionMemory(jagged_dimension* jd) {
     if (jd == NULL)
         return;
     freeDimensionMemory(jd->inner_size);
@@ -61,27 +68,27 @@ void freeJaggedDimensionMemory(jagged_dimension* jd){
     free(jd);
 }
 
-void freeTableExpression(expression* exp){
+void freeTableExpression(expression* exp) {
     if (exp == NULL)
         return;
     if (exp->a)
         if (exp->a->basicElementType)
             free(exp->a->basicElementType);
-    if (exp->b){
+    if (exp->b) {
         if (exp->b->basicElementType)
-            free (exp->b->basicElementType);
+            free(exp->b->basicElementType);
         freeRectDimensionMemory(exp->b->d);
         free(exp->b);
     }
-    if (exp->c){
+    if (exp->c) {
         if (exp->c->basicElementType)
-            free (exp->c->basicElementType);
+            free(exp->c->basicElementType);
         freeJaggedDimensionMemory(exp->c->d);
-        free (exp->c);
+        free(exp->c);
     }
 }
 
-void freeTypeExpressionTableMemory(typeExpressionTable* tablePointer){
+void freeTypeExpressionTableMemory(typeExpressionTable* tablePointer) {
     if (tablePointer == NULL)
         return;
     if (tablePointer->name) free(tablePointer->name);
@@ -90,7 +97,7 @@ void freeTypeExpressionTableMemory(typeExpressionTable* tablePointer){
     free(tablePointer);
 }
 
-void freeTokenStreamMemory(tokenStream* t){
+void freeTokenStreamMemory(tokenStream* t) {
     if (t == NULL)
         return;
     tokenStream* next = t->next;
@@ -100,7 +107,7 @@ void freeTokenStreamMemory(tokenStream* t){
     freeTokenStreamMemory(next);
 }
 
-void freeGrammarRuleMemory(grammarNode* Gi){
+void freeGrammarRuleMemory(grammarNode* Gi) {
     if (Gi == NULL)
         return;
     grammarNode* next = Gi->next;
@@ -109,13 +116,13 @@ void freeGrammarRuleMemory(grammarNode* Gi){
     freeGrammarRuleMemory(next);
 }
 
-void freeGrammarMemory(grammarNode** G){
-    for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
+void freeGrammarMemory(grammarNode** G) {
+    for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++) {
         freeGrammarRuleMemory(G[i]);
     }
 }
 
-void freeStackMemory(stack* st){
+void freeStackMemory(stack* st) {
     // printf("inside freeStackMemory\n");
     if (st == NULL)
         return;
