@@ -66,9 +66,13 @@ int main(int argc, char* argv[]) {
             break;
         }
         case 3: {
-            if (ParseTree == NULL){
-                printf("Parse Tree does not exist. Generating it!\n");
-                ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
+            if (TypeExpressionTable == NULL){
+                if (ParseTree == NULL){
+                    ParseTree = createParseTree(ParseTree, TokenStreamPointer, Grammar);
+                    // printf("Parse Tree Created\n");
+                }
+                traverseParseTree(&ParseTree, &TypeExpressionTable);
+                printf("Traversal Complete\n");
             }
             printParseTree(ParseTree);
             break;

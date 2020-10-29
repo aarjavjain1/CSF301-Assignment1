@@ -61,6 +61,7 @@ void printTypeExpression (typeExpressionTable *T){
 void printTypeExpressionTable(typeExpressionTable* T){
     typeExpressionTable* l = T;
     printf("%20s\t%20s\t%20s\t%10s\n", "Field1", "Field2", "Field3", "Field4");
+    printf("%20s\t%20s\t%20s\t%10s\n", "------", "------", "------", "------");
     while(l){
         printf("%20s\t", l->name);
         if (l->type == primitive)
