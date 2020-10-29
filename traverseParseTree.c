@@ -355,7 +355,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     temp = temp->next;
                 }
                 if(temp == NULL){
-                    strcpy(*msg ,"Undeclared Variable or Type Definition Error of Variable\n");
+                    if(input->children[0]->lexeme)
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                    else
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 return temp;
@@ -377,7 +380,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     temp = temp->next;
                 }
                 if(temp == NULL){
-                    strcpy(*msg ,"Undeclared Variable or Type Definition Error of Variable\n");
+                    if(input->children[0]->lexeme)
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                    else
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 if (temp->type == jagged_array){
@@ -583,7 +589,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   temp = temp->next;
               }
               if(temp == NULL){
-                  strcpy(*msg ,"Undeclared Variable or Type Definition Error of Variable\n");
+                  if(input->children[0]->lexeme)
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                  else
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
                   return NULL;
               }
               return temp;
@@ -606,7 +615,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   temp = temp->next;
               }
               if(temp == NULL){
-                  strcpy(*msg ,"Undeclared Variable or Type Definition Error of Variable\n");
+                  if(input->children[0]->lexeme)
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                  else
+                    snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
                   return NULL;
               }
               if (temp->type == jagged_array){
@@ -800,7 +812,10 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     temp = temp->next;
                 }
                 if(temp == NULL){
-                    strcpy(*msg ,"Undeclared Variable or Type Definition Error of Variable\n");
+                    if(input->children[0]->lexeme)
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->lexeme);
+                    else
+                      snprintf(*msg,200,"Undeclared or Type Error in Declaration of %s\n",input->children[0]->children[0]->lexeme);
                     return NULL;
                 }
                 return temp;
@@ -896,7 +911,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         if ((*t)->children[0]->type == NULL) {
             printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
             printf(", Depth in Parse Tree: %d", (*t)->depth);
-            printf(", dMessage: %s\n\n", buffer);
+            printf(", Message: %s\n\n", buffer);
         }
         addAssignment(&(*t)->children[2], T);
         op = 4;
@@ -907,7 +922,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
             printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
             printf(", Depth in Parse Tree: %d", (*t)->depth);
             // printf("")
-            printf(", sMessage: %s\n\n", buffer);
+            printf(", Message: %s\n\n", buffer);
         }
         return;
     } else {
