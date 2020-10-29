@@ -82,7 +82,7 @@ parseTree* parseTreeGetCurrent(parseTree* t) {
 }
 
 void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi) {
-    if (current == NULL)
+    if (current == NULL){return;}
         // printf("populateChildren Got null current with rule: %s", Gi->grammarWord);
     int childToPopulate = 0;
     while (Gi->next != NULL) {
