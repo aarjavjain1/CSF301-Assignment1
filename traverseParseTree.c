@@ -196,7 +196,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             printf(" %s", parseArray[z]->lexeme);
                         }
                         printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
-                        printf(", Message: %d is lesser than %d, lower dimension of dimension 2\n\n", jd->parent, low); 
+                        printf(", Message: %d is lesser than %d, lower dimension of dimension 2\n\n", jd->parent, low);
                         return;
                     }
                     if (jd->parent > high) {
@@ -206,7 +206,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                             printf(" %s", parseArray[z]->lexeme);
                         }
                         printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
-                        printf(", Message: %d is higher than %d, higher dimension of dimension 2\n\n", jd->parent, high); 
+                        printf(", Message: %d is higher than %d, higher dimension of dimension 2\n\n", jd->parent, high);
                         return;
                     }
                     jd->size = atoi(parseArray[colon + 6]->lexeme);
@@ -253,7 +253,7 @@ void addDeclaration(parseTree** t, typeExpressionTable** T) {
                                         printf(" %s", parseArray[z]->lexeme);
                                     }
                                     printf(", Depth in Parse Tree: %d", parseArray[colon]->depth);
-                                    printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n"); 
+                                    printf(", Message: Size of 2nd dimension and number of elements mismatch\n\n");
                                     return;
                                 }
                                 if (!strcmp(parseArray[colon]->symbolName, "NUMBER"))
@@ -438,7 +438,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                             // s1--;
                         }
                         int high_2 = inner_details->size;
-                        if(s2>=high_2){
+                        if(s2>high_2){
                             snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s2, high_2);
                             return NULL;
                         }
@@ -472,7 +472,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                             s1--;
                         }
                         int high_2 = inner_details->size;
-                        if(s2>=high_2){
+                        if(s2>high_2){
                             snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s2, high_2);
                             return NULL;
                         }
@@ -482,7 +482,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                             high_3++;
                             inner_inner_details = inner_inner_details->next;
                         }
-                        if(s3>=high_3){
+                        if(s3>high_3){
                             snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s3, high_3);
                             return NULL;
                         }
@@ -657,7 +657,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                           s1--;
                       }
                       int high_2 = inner_details->size;
-                      if(s2>=high_2){
+                      if(s2>high_2){
                           snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s2, high_2);
                           return NULL;
                       }
@@ -693,7 +693,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                           s1--;
                       }
                       int high_2 = inner_details->size;
-                      if(s2>=high_2){
+                      if(s2>high_2){
                           snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s2, high_2);
                           return NULL;
                       }
@@ -703,7 +703,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                         high_3++;
                         inner_inner_details = inner_inner_details->next;
                       }
-                      if(s3>=high_3){
+                      if(s3>high_3){
                           snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s3, high_3);
                           return NULL;
                       }
@@ -909,7 +909,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
-                printf(", Message: Boolean Operation Type Mismatch\n\n"); 
+                printf(", Message: Boolean Operation Type Mismatch\n\n");
                 // printf("Error aa gayi 1 %s %d\n", (*t)->symbolName, (*t)->lineNumber);
             }
         } else if (op == 2) {
@@ -948,7 +948,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 (*t)->type = temp;
             } else {
                 (*t)->type = NULL;
-                
+
                 printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment, ", getLineNumber(*t));
                 printf("Operator: %3s, ", (*t)->children[1]->children[0]->lexeme);
                 printf("Lexeme of First Operand: %5s, Type of First Operand: ", (*t)->children[0]->type->name);
@@ -956,7 +956,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
-                printf(", Message: Division Operation Type Mismatch\n\n"); 
+                printf(", Message: Division Operation Type Mismatch\n\n");
             }
         } else if (op == 4) {
             if (compare((*t)->children[0]->type, (*t)->children[2]->type, 1) || compare((*t)->children[0]->type, (*t)->children[2]->type, 2))
@@ -972,7 +972,7 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
                 printf(", Lexeme of Second Operand: %5s, Type of Second Operand: ", (*t)->children[2]->type->name);
                 printTypeExpressionTable((*t)->children[2]->type);
                 printf(", Depth in Parse Tree: %d", (*t)->depth);
-                printf(", Message: Assignment Type Mismatch\n\n"); 
+                printf(", Message: Assignment Type Mismatch\n\n");
             }
         }
     }
