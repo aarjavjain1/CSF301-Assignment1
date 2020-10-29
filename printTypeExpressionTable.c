@@ -15,23 +15,7 @@ Group Member details:
 
 // Function Definition: printTypeExpressionTable (typeExpressionTable T)
 void printTypeExpression (typeExpressionTable *T){
-    // printf ("Inside printTypeExpressionTable.\n");
-    // printf("Field1\t\tField2\t\tField3\t\tField4\n");
     typeExpressionTable* l = T;
-    // while(l){
-        // printf("%s\t", l->name);
-        // if (l->type == primitive)
-        //     printf("Primitive\t");
-        // else if (l->type == rect_array)
-        //     printf("Rectangular Array\t");
-        // else if (l->type == jagged_array)
-        //     printf("Jagged Array\t");
-        // if (l->array_type == stat)
-        //     printf("Static\t");
-        // else if (l->array_type == dyn)
-        //     printf("Dynamic\t");
-        // else if (l->array_type == NA)
-        //     printf("Not Applicable\t");
     if (l->type == primitive){
         printf("<type = %s>", l->exp->a->basicElementType);
     }
@@ -65,28 +49,28 @@ void printTypeExpression (typeExpressionTable *T){
             if (temp->next) printf(",");
             temp = temp->next;
         }
+        printf("), basicElementType=INTEGER>");
     }
-        // printf("\n");
     return;
 }
 
 void printTypeExpressionTable(typeExpressionTable* T){
     typeExpressionTable* l = T;
-    printf("Field1\t\tField2\t\tField3\t\tField4\n");
+    printf("%20s\t%20s\t%20s\t%10s\n", "Field1", "Field2", "Field3", "Field4");
     while(l){
-        printf("%s\t", l->name);
+        printf("%20s\t", l->name);
         if (l->type == primitive)
-            printf("Primitive\t");
+            printf("%20s\t","Primitive");
         else if (l->type == rect_array)
-            printf("Rectangular Array\t");
+            printf("%20s\t","Rectangular Array");
         else if (l->type == jagged_array)
-            printf("Jagged Array\t");
+            printf("%20s\t","Jagged Array");
         if (l->array_type == stat)
-            printf("Static\t");
+            printf("%20s\t","Static");
         else if (l->array_type == dyn)
-            printf("Dynamic\t");
+            printf("%20s\t","Dynamic");
         else if (l->array_type == NA)
-            printf("Not Applicable\t");
+            printf("%20s\t","Not Applicable");
         printTypeExpression(l);
         printf("\n");
         l = l->next;
