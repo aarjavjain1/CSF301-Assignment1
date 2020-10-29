@@ -1,12 +1,5 @@
 /*
 This file contains datastructures and function prototypes necessary for implementation of this compiler.
-The components of this file are as follows:
-
-Data Structures:
-    1. grammer
-    2. tokenStream
-    3. parseTree
-    4. typeExpressionTable
 */
 
 //////////////////////////////DATA STRUCTURES////////////////////////////////////////////
@@ -146,4 +139,58 @@ int printParseTree (parseTree *t);
 // Function Prototype: printTypeExpressionTable (typeExpressionTable T)
 int printTypeExpressionTable (typeExpressionTable *T);
 
+
+/////////////////////////////UTILITY FUNCTION PROTOTYPES//////////////////////////////////
+
 void print_grammar_rule(grammarNode* root);
+
+////// Utility functions to free memory on heap
+void freeParseTreeNodeChildrenAll(parseTree *t);
+void freeParseTreeNodeChildren(parseTree* t);
+void freeParseTreeMemory(parseTree *rootOfParseTree);
+void freeRectDimensionMemory(rect_dimension* rd);
+void freeDimensionMemory(dimension* d);
+void freeJaggedDimensionMemory(jagged_dimension* jd);
+void freeTableExpression(expression* exp);
+void freeTypeExpressionTableMemory(typeExpressionTable* tablePointer);
+void freeTokenStreamMemory(tokenStream* t);
+void freeGrammarRuleMemory(grammarNode* Gi);
+void freeGrammarMemory(grammarNode** G);
+void freeStackMemory(stack* st);
+
+////// Utility functions for readGrammar
+// trimwhitespace(char* str) is utility for both reagGrammar and tokeniseSourcecode
+
+
+////// Utility functions for tokeniseSourcecode
+char *trimwhitespace(char *str);
+bool isVariable(char* str);
+bool isNumber(char* str);
+int search(char* token);
+tokenStream* get_token(char* token,int* line_count);
+
+
+////// Utility functions for createParseTree
+int isGrammarWordTerminal(char* str);
+int isEmpty(stack* root);
+stack* stack_top(stack* root);
+stack* stack_pop(stack* root);
+stack* stack_push(stack* root, char* str);
+stack* stack_pushrhs(stack* root, grammarNode* G);
+void print_stack(stack* root);
+parseTree* parseTreeGetCurrent(parseTree* t);
+void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi);
+int predictRule(int grammarRuleNum, grammarNode** G, tokenStream** recievedToken, grammarOrderNode **grammarOrderAddress, parseTree* t);
+
+////// Utilify functions for printParseTree
+int printParseTreeWithDepth (parseTree *t, int currentDepth);
+
+////// Utility functions for traverseParseTree
+void recurse(parseTree *t);
+void addDeclaration(parseTree** t, typeExpressionTable **T);
+typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table);
+void addAssignment(parseTree** t, typeExpressionTable *T);
+int compare(typeExpressionTable* a, typeExpressionTable* b, int op);
+int max(int a, int b);
+int min(int a, int b);
+

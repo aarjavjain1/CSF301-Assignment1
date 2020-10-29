@@ -188,7 +188,6 @@ char *trimwhitespace(char *str)
 tokenStream* get_token(char* token,int* line_count)
 {
     tokenStream *new = (tokenStream *) malloc(sizeof(tokenStream));
-    // new->tokenName = (char *) malloc (sizeof(char) * 100);
     if (search(token) == 1){
       // printf("NICHT\n");
       char *temp_ = (char *) malloc(sizeof(char)*(strlen(token)+1));
@@ -431,11 +430,6 @@ int isGrammarWordTerminal(char* str){
     return 0;
 }
 
-// stack* newNode(char* str)
-// {
-//     return NULL;
-// }
-
 stack* stack_push(stack* root, char* str){
     stack* stackNode = (stack*)malloc(sizeof(stack));
     stackNode->str = (char*) malloc(sizeof(char) * (strlen(str) + 1));
@@ -467,14 +461,6 @@ void print_stack(stack* root){
     printf("\n");
 }
 
-void print_grammar_rule(grammarNode* root){
-    while (root){
-        printf ("%s -> ", root->grammarWord);
-        root = root->next;
-    }
-    printf("\n");
-}
-
 int readGrammar (char* grammarFilePath,  grammarNode** G){
     printf ("Inside readGrammar.\n");
     FILE* fp;
@@ -495,7 +481,6 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
         buffer = trimwhitespace(buffer);
 
         token = strtok(buffer, " ");
-        // printf("lol\n");
         grammarNode * temp = (grammarNode*)malloc(sizeof(grammarNode));
         grammarNode * head = temp;
         temp->grammarWord = (char *)malloc(sizeof(char)*(strlen(token) + 1));
@@ -507,73 +492,17 @@ int readGrammar (char* grammarFilePath,  grammarNode** G){
                 token = strtok(NULL," ");
                 continue;
             }
-            // printf( "%s\n", token );
             temp->next = (grammarNode*)malloc(sizeof(grammarNode));
             temp = temp->next;
             temp->next = NULL;
             temp->grammarWord = (char *)malloc(sizeof(char)*(strlen(token)+1));
             strcpy(temp->grammarWord,token);
-            // printf("HERE");
             token = strtok(NULL, " ");
         }
-        // printf("%s\n", buffer);
         G[line_num++] = head;
-        // printf("GRAMMARWORD %s\n",G[line_num++]->grammarWord);
     }
     fclose(fp);
-    // for(int i = 0; i< NUMBER_OF_GRAMMAR_RULES; i++){
-    //     // printf("%d",i);
-    //     grammarNode* t = G[i];
-    //     while (t!= NULL){
-    //       printf("%s\t",t->grammarWord);
-    //       t = t->next;
-    //     }
-    //     printf("\n");
-    // }
     return 0;
-}
-
-grammarOrderNode* grammarOrderAdd(int ruleNum, grammarOrderNode *grammarOrder){
-    if (grammarOrder == NULL){
-        grammarOrder = (grammarOrderNode*) malloc(sizeof(grammarOrderNode));
-        grammarOrder->grammarRuleNum = ruleNum;
-        grammarOrder->next = NULL;
-        return grammarOrder;
-    }
-    grammarOrderNode *temp = grammarOrder;
-    while (temp->next != NULL)
-        temp = temp->next;
-    temp->next = (grammarOrderNode*) malloc(sizeof(grammarOrderNode));
-    temp->grammarRuleNum = ruleNum;
-    temp->next->next = NULL;
-    return grammarOrder;
-}
-
-grammarOrderNode* grammarOrderRemoveLast(grammarOrderNode *grammarOrder){
-    grammarOrderNode *temp = grammarOrder;
-    if (temp == NULL)
-        return temp;
-    if (temp->next == NULL){
-        free(temp);
-        return NULL;
-    }
-    while (temp->next->next != NULL)
-        temp = temp->next;
-    free(temp->next);
-    temp->next = NULL;
-    return grammarOrder;
-}
-
-//remove after debugging
-void printParseTreeNode(parseTree* node){
-    // printf ("Current stats ----");
-    // if (node == NULL)
-    //     printf("NULL hai\n");
-    // else {
-    //     printf (" %lu \n", node);
-    // }
-    // printf("isterminal : %d --\n", node->isTerminal);
-    // printf("symbolName : %s --\n", node->symbolName);
 }
 
 // Function Definition: tokeniseSourcecode(  “sourcecode.txt”,  tokenStream  *s)
@@ -582,10 +511,6 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     FILE* fp;
     char* token;
     fp = fopen(sourceCodeFilePath, "r");
-    // if (fp == NULL) {
-    //   perror("Failed: ");
-    //   return 1;
-    // }
 
     char *buffer = (char* ) malloc(sizeof(char) * MAX_LEN);
     // -1 to allow room for NULL terminator for really long string
@@ -616,10 +541,6 @@ tokenStream* tokeniseSourcecode (char* sourceCodeFilePath,  tokenStream  *s){
     fclose(fp);
     s = head;
     tokenStream* test = head;
-    // while(test != NULL){
-    //   printf("%s\n",test->tokenName );
-    //   test = test->next;
-    // }
     return head;
 }
 
@@ -766,11 +687,6 @@ parseTree* createParseTree (parseTree  *t,  tokenStream  *s,  grammarNode**  G){
             int ruleSelectedFlag = 0;
                 for (int i = 0; i < NUMBER_OF_GRAMMAR_RULES; i++){
                     if (!strcmp(G[i]->grammarWord, stack_top(st)->str) && !ruleSelectedFlag){
-                        // {
-                            // printf ("seding grammar rule: ");
-                            // print_grammar_rule(G[i]);
-                            // printParseTreeNode(current);
-                        // }
                         tokenStream* sentToken = currentToken;
                         int predict = predictRule(i, G, &sentToken, &grammarOrder, current);
                         if (predict == 1){
@@ -1447,10 +1363,12 @@ void addAssignment(parseTree** t, typeExpressionTable *T){
         addAssignment(&(*t)->children[2], T);
         op = 4;
         //compare
-    } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
+    } 
+    else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
         (*t)->type = getExpression(*t, T);
         return;
-    } else {
+    } 
+    else {
         if ((*t)->children[1] == NULL){
             addAssignment(&(*t)->children[0], T);
             (*t)->type = (*t)->children[0]->type;
@@ -1635,7 +1553,5 @@ int printTypeExpressionTable (typeExpressionTable *T){
             printf("), basicElementType=INTEGER>");
         }
         printf("\n");
-        // l = l->next;
-    // }
     return 0;
 }
