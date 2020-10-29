@@ -859,14 +859,15 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op) {
 void addAssignment(parseTree** t, typeExpressionTable* T) {
     // printf("Inside addAssignment\n%s\n%s\n\n", (*t)->symbolName, (*t)->lexeme);
     // printParseTree(*t);
+    char* buffer = (char*)malloc(sizeof(char)*200);
     int op = -1;
     if (!strcmp((*t)->symbolName, "assignment")) {
-        (*t)->children[0]->type = getExpression((*t)->children[0], T);
+        (*t)->children[0]->type = getExpression((*t)->children[0], T, &buffer);
         addAssignment(&(*t)->children[2], T);
         op = 4;
         //compare
     } else if (!strcmp((*t)->symbolName, "factor") || !strcmp((*t)->symbolName, "lhs")) {
-        (*t)->type = getExpression(*t, T);
+        (*t)->type = getExpression(*t, T, &buffer);
         return;
     } else {
         if ((*t)->children[1] == NULL) {
@@ -881,19 +882,32 @@ void addAssignment(parseTree** t, typeExpressionTable* T) {
         else if (!strcmp((*t)->children[1]->children[0]->symbolName, "OP_DIV"))
             op = 3;  //division
         if (!strcmp((*t)->children[0]->symbolName, "factor")) {
-            (*t)->children[0]->type = getExpression((*t)->children[0], T);
+            (*t)->children[0]->type = getExpression((*t)->children[0], T, &buffer);
         } else {
             addAssignment(&(*t)->children[0], T);
         }
         if (!strcmp((*t)->children[2]->symbolName, "factor")) {
-            (*t)->children[2]->type = getExpression((*t)->children[2], T);
+            (*t)->children[2]->type = getExpression((*t)->children[2], T, &buffer);
         } else {
             addAssignment(&(*t)->children[2], T);
         }
     }
     if ((*t)->children[0]->type == NULL || (*t)->children[2]->type == NULL) {
+        // printf("Error aa gayi %s %d\n\n", (*t)->symbolName, getLineNumber(*t));
+        // printParseTree(*t);
         (*t)->type = NULL;
-        // printf("Error aa gayi %s %d\n", (*t)->symbolName, (*t)->lineNumber);
+        parseTree* ttemp = (*t)->children[0];
+        while (ttemp && ttemp->children[1] == NULL) {
+            // printf("%s %s %d\n", (ttemp)->symbolName, (ttemp)->lexeme, getLineNumber(ttemp));
+            if ((!strcmp((ttemp)->symbolName, "factor") && (ttemp)->type == NULL) || (!strcmp((ttemp)->symbolName, "lhs") && (ttemp)->type == NULL)) {
+                getExpression(ttemp, T, &buffer);
+                printf("\nType Expression Error, Line Number: %3d, Statement Type: Assignment", getLineNumber(*t));
+                printf(", Depth in Parse Tree: %d", (*t)->depth);
+                printf(", Message: %s\n\n", buffer);
+                break;
+            }
+            ttemp = ttemp->children[0];
+        }
     } else {
         if (op == 1) {
             // if ((*t)->children[0]->type->type == primitive && !strcmp((*t)->children[0]->type->exp->a->basicElementType,"BOOLEAN") &&
