@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "customcompiler.h"
+#include "datastructuresandprototypes.h"
 
 #define GRAMMAR_FILE_PATH "grammar.txt"
 #define SOURCE_CODE_FILE_PATH "sourcecode.txt"

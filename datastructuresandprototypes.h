@@ -3,6 +3,7 @@ This file contains datastructures and function prototypes necessary for implemen
 */
 
 //////////////////////////////DATA STRUCTURES////////////////////////////////////////////
+#include <stdbool.h>
 
 #ifndef DATA_STRUCTURE_SIZES
 #define DATA_STRUCTURE_SIZES
@@ -13,6 +14,8 @@ This file contains datastructures and function prototypes necessary for implemen
     #define MAX_PARSE_TREE_CHILDREN 15
     #define MAX_SIZE_OF_LEXEME MAX_SIZE_OF_IDENTIFIER
     #define MAX_VARIABLES 1000
+    #define MAX_LEN 1000
+
 #endif
 
 #ifndef DATA_STRUCTURES
@@ -163,7 +166,7 @@ void freeStackMemory(stack* st);
 
 
 ////// Utility functions for tokeniseSourcecode
-char *trimwhitespace(char *str);
+char* trimwhitespace(char *str);
 bool isVariable(char* str);
 bool isNumber(char* str);
 int search(char* token);
@@ -172,12 +175,10 @@ tokenStream* get_token(char* token,int* line_count);
 
 ////// Utility functions for createParseTree
 int isGrammarWordTerminal(char* str);
-int isEmpty(stack* root);
 stack* stack_top(stack* root);
 stack* stack_pop(stack* root);
 stack* stack_push(stack* root, char* str);
 stack* stack_pushrhs(stack* root, grammarNode* G);
-void print_stack(stack* root);
 parseTree* parseTreeGetCurrent(parseTree* t);
 void populateChildrenGrammarNode(parseTree* current, grammarNode* Gi);
 int predictRule(int grammarRuleNum, grammarNode** G, tokenStream** recievedToken, grammarOrderNode **grammarOrderAddress, parseTree* t);
@@ -194,3 +195,5 @@ int compare(typeExpressionTable* a, typeExpressionTable* b, int op);
 int max(int a, int b);
 int min(int a, int b);
 
+////// Utility functions for printParseTree
+// No utility functions
