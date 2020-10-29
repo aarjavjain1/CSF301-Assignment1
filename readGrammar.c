@@ -22,7 +22,6 @@ int readGrammar(char* grammarFilePath, grammarNode** G) {
         perror("Failed: ");
         return 1;
     }
-
     char* buffer = (char*)malloc(sizeof(char) * MAX_LEN);
 
     int line_num = 0;
@@ -33,6 +32,7 @@ int readGrammar(char* grammarFilePath, grammarNode** G) {
 
         token = strtok(buffer, " ");
         grammarNode* temp = (grammarNode*)malloc(sizeof(grammarNode));
+        temp->grammarRuleNum = line_num + 1;
         grammarNode* head = temp;
         temp->grammarWord = (char*)malloc(sizeof(char) * (strlen(token) + 1));
         strcpy(temp->grammarWord, token);
@@ -45,6 +45,7 @@ int readGrammar(char* grammarFilePath, grammarNode** G) {
             }
             temp->next = (grammarNode*)malloc(sizeof(grammarNode));
             temp = temp->next;
+            temp->grammarRuleNum = line_num + 1;
             temp->next = NULL;
             temp->grammarWord = (char*)malloc(sizeof(char) * (strlen(token) + 1));
             strcpy(temp->grammarWord, token);

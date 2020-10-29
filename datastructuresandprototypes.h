@@ -32,6 +32,7 @@ This file contains datastructures and function prototypes necessary.
     // Here we define grammarNode. The grammer is an array of these grammarNodes, as declared in driver.c
     typedef struct grammarNodeStruct{
         char *grammarWord;
+        int grammarRuleNum;
         struct grammarNodeStruct* next;
     }grammarNode;
 

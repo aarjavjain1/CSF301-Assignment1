@@ -17,6 +17,8 @@ Group Member details:
 void printTypeExpression (typeExpressionTable *T){
     // printf ("Inside printTypeExpressionTable.\n");
     // printf("Field1\t\tField2\t\tField3\t\tField4\n");
+    if (T == NULL)
+        return;
     typeExpressionTable* l = T;
     // while(l){
         // printf("%s\t", l->name);

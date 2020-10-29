@@ -15,7 +15,42 @@ Group Member details:
 
 // Function Definition: printParseTree (parseTree *t)
 int printParseTree(parseTree *t) {
-    printf("Printing Tree ---- depth: %d ---- line number: %d parseTreeNode: %s \n", t->depth, t->lineNumber, t->symbolName);
+    if (t == NULL)
+        return 1;
+    if (t->depth == 0)
+        printf ("Symbol\tisTerminal\tType Expression\tlexeme\tLine Number\tGrammar Rule Number\tDepth\n");
+    printf("%s \t", t->symbolName);
+    if (t->isTerminal){
+        printf("true \t");
+    } else {
+        printf("false \t");
+    }
+    if (!(t->isLeaf)) {
+        printTypeExpression(t->type);
+        printf("\t");
+    } else {
+        printf ("- \t");
+    } 
+    if (t->isLeaf) {
+        printf("%s \t", t->lexeme);
+    } else {
+        printf("- \t");
+    }
+    if (t->isLeaf) {
+        printf("%d \t", t->lineNumber);
+    } else {
+        printf("- \t");
+    }
+    if (!(t->isLeaf)) {
+        printf("Rule %d \t", t->grammarRuleUsed->grammarRuleNum);
+    } else {
+        printf("- \t");
+    }
+    printf("%d \t", t->depth);
+    printf("\n");
+    //line, grammar, depth
+    
+    // print children
     for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++) {
         if (t->children[i])
             printParseTree(t->children[i]);
