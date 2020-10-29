@@ -190,7 +190,7 @@ int predictRule(int grammarRuleNum, grammarNode** G, tokenStream** recievedToken
 void populateParseTreeDepth(parseTree* t, int currentDepth);
 
 ////// Utility functions for traverseParseTree
-void recurse(parseTree *t);
+void recurse(parseTree* t, parseTree* parseArray[], int* parseIndex);
 void addDeclaration(parseTree** t, typeExpressionTable **T);
 typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table);
 void addAssignment(parseTree** t, typeExpressionTable *T);

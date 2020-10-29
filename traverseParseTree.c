@@ -13,8 +13,8 @@ Group Member details:
 
 #include "datastructuresandprototypes.h"
 
-parseTree* parseArray[MAX_VARIABLES];
-static int parseIndex = 0;
+// parseTree* parseArray[MAX_VARIABLES];
+// static int parseIndex = 0;
 
 int max(int a, int b) {
     if (a > b)
@@ -30,24 +30,26 @@ int min(int a, int b) {
         return a;
 }
 
-void recurse(parseTree* t) {
+void recurse(parseTree* t, parseTree* parseArray[], int* parseIndex) {
     if (t && t->isLeaf) {
-        parseArray[parseIndex] = t;
-        parseIndex++;
+        parseArray[*parseIndex] = t;
+        (*parseIndex)++;
     } else {
         for (int i = 0; i < MAX_PARSE_TREE_CHILDREN; i++)
             if (t->children[i])
-                recurse(t->children[i]);
+                recurse(t->children[i], parseArray, parseIndex);
     }
 }
 
 void addDeclaration(parseTree** t, typeExpressionTable** T) {
     // printf("Printing Declaration Tree ----  parseTreeNode: %s -> ", t->symbolName);
+    parseTree* parseArray[MAX_VARIABLES];
+    int parseIndex = 0;
     for (int i = 0; i < MAX_VARIABLES; i++) {
         parseArray[i] = NULL;
     }
     parseIndex = 0;
-    recurse(*t);
+    recurse(*t, parseArray, &parseIndex);
     // for (int i = 0; i < parseIndex; i++) {
     //     printf("%s ", parseArray[i]->symbolName);
     // }
