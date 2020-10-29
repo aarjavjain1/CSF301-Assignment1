@@ -499,6 +499,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     }
                 }
                 else if (temp->type == rect_array){
+                    // printf("%d\n",numNums);
                     if(temp->array_type == dyn){
                       if (numNums != temp->exp->b->dimensions){
                           strcpy(*msg,"Element at index is not primitive\n");
@@ -538,15 +539,17 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                     rect_dimension* temp_rect = temp->exp->b->d;
                     int dimension = 1;
                     while(temp_rect!=NULL){
-                        int dim_ = atoi(rec->children[0]->symbolName);
+                        int dim_ = atoi(rec->children[0]->lexeme);
                         int high = atoi(temp_rect->high);
                         int low = atoi(temp_rect->low);
+                        // printf("%d\n%d\n%d\n",dim_,high,low);
                         if(dim_>high){
                             snprintf(*msg,200,"Type error as %d is greater than %d, the high range of dimension %d\n",dim_,high,dimension);
                             return NULL;
                         }
                         if(dim_<low){
-                            snprintf(*msg,200,"Type error as %d is lower than %d, the high range of dimension %d\n",dim_,low,dimension);
+                            // printf("LESS\n");
+                            snprintf(*msg,200,"Type error as %d is lower than %d, the low range of dimension %d\n",dim_,low,dimension);
                             return NULL;
                         }
                         temp_rect = temp_rect->next;
@@ -704,7 +707,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                         inner_inner_details = inner_inner_details->next;
                       }
                       if(s3>high_3){
-                          snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 2", s3, high_3);
+                          snprintf(*msg, 200, "Type error as %d is greater than %d, high range of dimension 3", s3, high_3);
                           return NULL;
                       }
                       typeExpressionTable* temp_ = (typeExpressionTable*)malloc(sizeof(typeExpressionTable));
@@ -745,7 +748,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                   rect_dimension* temp_rect = temp->exp->b->d;
                   int dimension = 1;
                   while(temp_rect!=NULL){
-                      int dim_ = atoi(rec->children[0]->symbolName);
+                      int dim_ = atoi(rec->children[0]->lexeme);
                       int high = atoi(temp_rect->high);
                       int low = atoi(temp_rect->low);
                       if(dim_>high){
@@ -753,7 +756,7 @@ typeExpressionTable* getExpression(parseTree * input, typeExpressionTable* table
                           return NULL;
                       }
                       if(dim_<low){
-                          snprintf(*msg,200,"Type error as %d is lower than %d, the high range of dimension %d\n",dim_,low,dimension);
+                          snprintf(*msg,200,"Type error as %d is lower than %d, the low range of dimension %d\n",dim_,low,dimension);
                           return NULL;
                       }
                       temp_rect = temp_rect->next;
