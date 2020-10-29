@@ -41,13 +41,20 @@ bool isNumber(char *str) {
 }
 
 int search(char *token) {
-    FILE *f = fopen("keywords.txt", "r");
-    char buffer[50];
-    while (EOF != fscanf(f, "%[^\n]\n", buffer)) {
-        if (!strcmp(buffer, token))
+    char* tokens[30] = {"declare","colon","list","of","variables","semicolon","array","integer","jagged","boolean","real","lsquare","dot","rsquare","number","r1","gsize","values","lcurly",\
+    "rcurly","equals","op_or","op_and","op_plus","op_minus","op_mult","op_div","program","lsimple","rsimple"};
+
+    // FILE *f = fopen("keywords.txt", "r");
+    // char buffer[50];
+    // while (EOF != fscanf(f, "%[^\n]\n", buffer)) {
+    //     if (!strcmp(buffer, token))
+    //         return 1;
+    // }
+    for(int i = 0;i<30;i++){
+        if(!strcmp(token,tokens[i]))
             return 1;
     }
-    fclose(f);
+    // fclose(f);
     return 0;
 }
 
