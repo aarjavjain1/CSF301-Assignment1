@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
 
     if (argc != 2){
         printf ("Usage: ./output testcase.txt\n");
+        return 0;
     }
     char* SOURCE_CODE_FILE_PATH = argv[1];
 
